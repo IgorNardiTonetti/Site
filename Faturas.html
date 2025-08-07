@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faturas e Assinatura - Pedidos On</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; 
+        }
+        .sidebar { transition: all 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text, .sidebar.collapsed .user-info .ml-3, .sidebar.collapsed .collapse-btn-text { display: none; }
+        .sidebar.collapsed .nav-item, .sidebar.collapsed .user-info, .sidebar.collapsed .collapse-btn-container button { justify-content: center; }
+        .sidebar.collapsed .user-info img { margin-left: 0; }
+        .content { transition: all 0.3s ease; margin-left: 16rem; }
+        .content.expanded { margin-left: 80px; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; z-index: 1000; transform: translateX(-100%); width: 256px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar.collapsed { width: 256px; }
+            .sidebar.collapsed.open .nav-text, .sidebar.collapsed.open .logo-text, .sidebar.collapsed.open .user-info .ml-3, .sidebar.collapsed.open .collapse-btn-text { display: inline-block; }
+            .sidebar.collapsed.open .nav-item, .sidebar.collapsed.open .user-info, .sidebar.collapsed.open .collapse-btn-container button { justify-content: flex-start; }
+            .content { margin-left: 0 !important; }
+            .content.expanded { margin-left: 0 !important; }
+            .mobile-menu-btn { display: block !important; }
+            .desktop-collapse-btn { display: none !important; }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Estilos para Modais e Formulários */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px #a5b4fc;
+        }
+        .delete-btn:disabled {
+            cursor: not-allowed;
+            background-color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar bg-indigo-800 text-white w-64 flex flex-col h-full fixed">
+             <div class="p-4 flex items-center border-b border-indigo-700">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <span class="logo-text ml-3 text-xl font-bold">Pedidos On</span>
+            </div>
+            <div class="user-info p-4 flex items-center border-b border-indigo-700 mb-2">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3">
+                    <div class="font-medium">Maria Silva</div>
+                    <div class="text-xs text-indigo-300">Admin</div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 hide-scrollbar">
+                <div class="space-y-1 px-3">
+                    <a href="Dashboard.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-home text-lg w-6"></i><span class="nav-text ml-3">Dashboard</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-chart-line text-lg w-6"></i><span class="nav-text ml-3">Analytics</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-users text-lg w-6"></i><span class="nav-text ml-3">Clientes</span>
+                    </a>
+                    <a href="pedidos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-shopping-cart text-lg w-6"></i><span class="nav-text ml-3">Pedidos</span>
+                    </a>
+                    <a href="produtos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-boxes text-lg w-6"></i><span class="nav-text ml-3">Produtos</span>
+                    </a>
+                    <a href="faturas.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-indigo-900 text-white"> <!-- Link Ativo -->
+                        <i class="fas fa-file-invoice-dollar text-lg w-6"></i><span class="nav-text ml-3">Faturas</span>
+                    </a>
+                    <a href="configuracoes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-cog text-lg w-6"></i><span class="nav-text ml-3">Configurações</span>
+                    </a>
+                </div>
+                <div class="px-3 mt-8">
+                    <div class="text-xs font-semibold text-indigo-300 uppercase tracking-wider px-4 mb-2 nav-text">Outros</div>
+                    <a href="ajuda.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-question-circle text-lg w-6"></i><span class="nav-text ml-3">Ajuda</span>
+                    </a>
+                    <a href="Login.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-sign-out-alt text-lg w-6"></i><span class="nav-text ml-3">Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content flex-1 flex flex-col overflow-hidden"> 
+            <header class="bg-white shadow-sm flex-shrink-0">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <button class="mobile-menu-btn hidden text-gray-600 hover:text-indigo-600 focus:outline-none" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-700">Faturas e Assinatura</h1>
+                    <div class="flex items-center space-x-4">
+                         <button class="relative p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-bell text-xl"></i>
+                        </button>
+                        <div class="relative">
+                            <button onclick="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none">
+                                <span class="hidden sm:block text-sm font-medium text-gray-700">Maria Silva</span>
+                                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                            </button>
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                                <a href="configuracoes.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configurações</a>
+                                <a href="Login.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <main class="flex-1 overflow-y-auto p-6 sm:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Coluna da Esquerda: Plano e Métodos de Pagamento -->
+                    <div class="lg:col-span-1 space-y-8">
+                        <!-- Card do Plano Atual -->
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Plano Atual</h2>
+                            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-indigo-800 text-lg">Plano Pro</span>
+                                    <span class="text-xl font-bold text-indigo-800">R$ 99/mês</span>
+                                </div>
+                                <p class="text-sm text-indigo-600 mt-2">Sua próxima fatura será em <span class="font-semibold">15 de Julho, 2025</span>.</p>
+                            </div>
+                            <button class="mt-4 w-full text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                                Mudar de Plano
+                            </button>
+                        </div>
+                        <!-- Card dos Métodos de Pagamento -->
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold text-gray-800">Métodos de Pagamento</h2>
+                                <button onclick="openCardModal()" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                                    <i class="fas fa-plus-circle mr-1"></i> Adicionar
+                                </button>
+                            </div>
+                            <div id="paymentMethodsList" class="space-y-3">
+                                <!-- Cartões serão inseridos aqui via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coluna da Direita: Histórico de Faturas -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Histórico de Faturas</h2>
+                         <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15 de Junho, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ 99,00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Pago</span></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-download mr-1"></i>Baixar</a></td>
+                                    </tr>
+                                     <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15 de Maio, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ 99,00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Pago</span></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-download mr-1"></i>Baixar</a></td>
+                                    </tr>
+                                     <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15 de Abril, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ 99,00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Pago</span></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-download mr-1"></i>Baixar</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar Novo Cartão -->
+    <div id="cardModal" class="modal-backdrop fixed inset-0 flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-md mx-4 transform scale-95">
+            <div class="flex justify-between items-center pb-3 mb-6 border-b border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-800">Adicionar Novo Cartão</h3>
+                <button onclick="closeCardModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="cardForm" class="space-y-4">
+                <div>
+                    <label for="cardNumber" class="block text-sm font-medium text-gray-700">Número do Cartão</label>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                </div>
+                <div>
+                    <label for="cardName" class="block text-sm font-medium text-gray-700">Nome no Cartão</label>
+                    <input type="text" id="cardName" placeholder="Seu nome como aparece no cartão" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                         <label for="cardExpiry" class="block text-sm font-medium text-gray-700">Validade (MM/AA)</label>
+                         <input type="text" id="cardExpiry" placeholder="MM/AA" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                    </div>
+                     <div>
+                         <label for="cardCVC" class="block text-sm font-medium text-gray-700">CVC</label>
+                         <input type="text" id="cardCVC" placeholder="123" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                    </div>
+                </div>
+                 <div class="flex items-start">
+                    <input id="setAsDefault" type="checkbox" checked class="h-4 w-4 mt-1 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="setAsDefault" class="ml-2 block text-sm text-gray-900">Definir como método de pagamento padrão</label>
+                </div>
+                 <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                    <button type="button" onclick="closeCardModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium text-sm">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium text-sm">Adicionar Cartão</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Sidebar ---
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const collapseIcon = document.getElementById('collapseIcon');
+        let isSidebarCollapsed = false;
+
+        function applySidebarState() {
+            if (window.innerWidth > 768) {
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    content.classList.add('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.classList.remove('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            } else {
+                content.classList.remove('expanded');
+                sidebar.classList.remove('collapsed');
+                if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+            }
+        }
+        function toggleSidebar() {
+            if (window.innerWidth > 768) {
+                isSidebarCollapsed = !isSidebarCollapsed;
+                applySidebarState();
+            }
+        }
+        function toggleMobileMenu() { sidebar.classList.toggle('open'); }
+         function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) userMenu.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', applySidebarState);
+        window.addEventListener('resize', applySidebarState);
+
+        // --- Lógica da Página de Faturas ---
+        let paymentMethods = [
+            { id: 1, brand: 'visa', last4: '4242', expiry: '12/26', isDefault: true },
+            { id: 2, brand: 'mastercard', last4: '8210', expiry: '08/25', isDefault: false }
+        ];
+
+        const paymentMethodsListDiv = document.getElementById('paymentMethodsList');
+        const cardModal = document.getElementById('cardModal');
+        const cardForm = document.getElementById('cardForm');
+        
+        function renderPaymentMethods() {
+            paymentMethodsListDiv.innerHTML = '';
+            if (paymentMethods.length === 0) {
+                paymentMethodsListDiv.innerHTML = `<p class="text-sm text-gray-500">Nenhum método de pagamento adicionado.</p>`;
+                return;
+            }
+
+            paymentMethods.forEach(card => {
+                const isOnlyCard = paymentMethods.length === 1;
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'flex items-center justify-between p-3 border rounded-lg';
+                cardDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fab fa-cc-${card.brand} text-2xl text-gray-700"></i>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">**** **** **** ${card.last4}</p>
+                            <p class="text-xs text-gray-500">Expira em ${card.expiry}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        ${card.isDefault ? '<span class="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full">Padrão</span>' : ''}
+                        <button onclick="deleteCard(${card.id})" class="delete-btn text-gray-400 hover:text-red-600 disabled:text-gray-300 disabled:hover:text-gray-300" ${isOnlyCard ? 'disabled' : ''} title="${isOnlyCard ? 'Não é possível excluir o único cartão' : 'Excluir cartão'}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                paymentMethodsListDiv.appendChild(cardDiv);
+            });
+        }
+
+        function openCardModal() {
+            cardForm.reset();
+            cardModal.classList.remove('hidden');
+            setTimeout(() => cardModal.classList.remove('opacity-0'), 10);
+            setTimeout(() => cardModal.querySelector('.modal-content').classList.remove('scale-95'), 10);
+        }
+
+        function closeCardModal() {
+            cardModal.classList.add('opacity-0');
+            cardModal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => cardModal.classList.add('hidden'), 300);
+        }
+
+        cardForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardName = document.getElementById('cardName').value;
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const setAsDefault = document.getElementById('setAsDefault').checked;
+
+            if (setAsDefault) {
+                paymentMethods.forEach(card => card.isDefault = false);
+            }
+
+            const newCard = {
+                id: Date.now(),
+                brand: 'visa', // Simulação, poderia ser detectado
+                last4: cardNumber.slice(-4),
+                expiry: cardExpiry,
+                isDefault: setAsDefault || paymentMethods.length === 0
+            };
+
+            paymentMethods.push(newCard);
+            renderPaymentMethods();
+            closeCardModal();
+        });
+
+        function deleteCard(cardId) {
+            if (paymentMethods.length <= 1) {
+                alert("Não é possível excluir o único método de pagamento.");
+                return;
+            }
+            if (confirm("Tem certeza que deseja excluir este cartão?")) {
+                paymentMethods = paymentMethods.filter(card => card.id !== cardId);
+                // Se o cartão padrão foi excluído, torna o primeiro da lista o novo padrão.
+                const hasDefault = paymentMethods.some(card => card.isDefault);
+                if (!hasDefault && paymentMethods.length > 0) {
+                    paymentMethods[0].isDefault = true;
+                }
+                renderPaymentMethods();
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPaymentMethods();
+        });
+
+    </script>
+</body>
+</html>

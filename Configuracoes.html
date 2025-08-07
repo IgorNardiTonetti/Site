@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Pedidos On</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; 
+        }
+        .sidebar { transition: all 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text, .sidebar.collapsed .user-info .ml-3, .sidebar.collapsed .collapse-btn-text { display: none; }
+        .sidebar.collapsed .nav-item, .sidebar.collapsed .user-info, .sidebar.collapsed .collapse-btn-container button { justify-content: center; }
+        .sidebar.collapsed .user-info img { margin-left: 0; }
+        .content { transition: all 0.3s ease; margin-left: 16rem; }
+        .content.expanded { margin-left: 80px; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; z-index: 1000; transform: translateX(-100%); width: 256px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar.collapsed { width: 256px; }
+            .sidebar.collapsed.open .nav-text, .sidebar.collapsed.open .logo-text, .sidebar.collapsed.open .user-info .ml-3, .sidebar.collapsed.open .collapse-btn-text { display: inline-block; }
+            .sidebar.collapsed.open .nav-item, .sidebar.collapsed.open .user-info, .sidebar.collapsed.open .collapse-btn-container button { justify-content: flex-start; }
+            .content { margin-left: 0 !important; }
+            .content.expanded { margin-left: 0 !important; }
+            .mobile-menu-btn { display: block !important; }
+            .desktop-collapse-btn { display: none !important; }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Estilo para o Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #4f46e5;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #4f46e5;
+        }
+        .delete-button:disabled {
+            background-color: #fca5a5; /* red-300 */
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar bg-indigo-800 text-white w-64 flex flex-col h-full fixed">
+             <div class="p-4 flex items-center border-b border-indigo-700">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <span class="logo-text ml-3 text-xl font-bold">Pedidos On</span>
+            </div>
+            <div class="user-info p-4 flex items-center border-b border-indigo-700 mb-2">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3">
+                    <div class="font-medium">Maria Silva</div>
+                    <div class="text-xs text-indigo-300">Admin</div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 hide-scrollbar">
+                <div class="space-y-1 px-3">
+                    <a href="Dashboard.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-home text-lg w-6"></i><span class="nav-text ml-3">Dashboard</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-chart-line text-lg w-6"></i><span class="nav-text ml-3">Analytics</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-users text-lg w-6"></i><span class="nav-text ml-3">Clientes</span>
+                    </a>
+                    <a href="pedidos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-shopping-cart text-lg w-6"></i><span class="nav-text ml-3">Pedidos</span>
+                    </a>
+                    <a href="produtos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-boxes text-lg w-6"></i><span class="nav-text ml-3">Produtos</span>
+                    </a>
+                    <a href="faturas.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-file-invoice-dollar text-lg w-6"></i><span class="nav-text ml-3">Faturas</span>
+                    </a>
+                    <a href="configuracoes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-indigo-900 text-white"> <!-- Link Ativo -->
+                        <i class="fas fa-cog text-lg w-6"></i><span class="nav-text ml-3">Configurações</span>
+                    </a>
+                </div>
+                <div class="px-3 mt-8">
+                    <div class="text-xs font-semibold text-indigo-300 uppercase tracking-wider px-4 mb-2 nav-text">Outros</div>
+                    <a href="ajuda.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-question-circle text-lg w-6"></i><span class="nav-text ml-3">Ajuda</span>
+                    </a>
+                    <a href="Login.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-sign-out-alt text-lg w-6"></i><span class="nav-text ml-3">Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content flex-1 flex flex-col overflow-hidden"> 
+            <header class="bg-white shadow-sm flex-shrink-0">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <button class="mobile-menu-btn hidden text-gray-600 hover:text-indigo-600 focus:outline-none" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-700">Configurações</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button onclick="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none">
+                                <span class="hidden sm:block text-sm font-medium text-gray-700">Maria Silva</span>
+                                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                            </button>
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                                <a href="configuracoes.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configurações</a>
+                                <a href="Login.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <main class="flex-1 overflow-y-auto p-6 sm:p-8">
+                <div class="max-w-2xl mx-auto space-y-8">
+                    <!-- Card de Notificações -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Preferências de Notificação</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">Receber e-mails de marketing</p>
+                                    <p class="text-sm text-gray-500">Novidades, promoções e dicas de uso.</p>
+                                </div>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="emailNotifications" id="emailNotifications" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                    <label for="emailNotifications" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                             <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">Receber notificações da aplicação</p>
+                                    <p class="text-sm text-gray-500">Alertas sobre novos pedidos e atividades importantes.</p>
+                                </div>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="appNotifications" id="appNotifications" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
+                                    <label for="appNotifications" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card de Zona de Perigo -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
+                         <h2 class="text-lg font-semibold text-red-700 mb-2">Zona de Perigo</h2>
+                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                            <div>
+                                <p class="font-medium text-gray-800">Excluir sua conta</p>
+                                <p id="delete-message" class="text-sm text-gray-500 mt-1">Esta ação é irreversível e irá apagar todos os seus dados. Você precisa quitar suas faturas pendentes antes de excluir.</p>
+                            </div>
+                            <button id="deleteAccountButton" class="mt-4 sm:mt-0 px-4 py-2 bg-red-600 text-white rounded-md font-medium text-sm delete-button hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50" onclick="handleAccountDeletion()">
+                                Excluir Conta
+                            </button>
+                         </div>
+                         <!-- Simulação de dívida pendente -->
+                         <div class="mt-4 text-xs text-gray-600">
+                            <p>Status da dívida: <span id="debtStatus" class="font-semibold text-red-600">Pendente</span></p>
+                            <button onclick="simulatePayDebt()" class="text-indigo-600 hover:underline">Clique aqui para simular o pagamento da dívida</button>
+                         </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- Sidebar ---
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const collapseIcon = document.getElementById('collapseIcon');
+        let isSidebarCollapsed = false;
+
+        function applySidebarState() {
+            if (window.innerWidth > 768) {
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    content.classList.add('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.classList.remove('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            } else {
+                content.classList.remove('expanded');
+                sidebar.classList.remove('collapsed');
+                if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+            }
+        }
+        function toggleSidebar() {
+            if (window.innerWidth > 768) {
+                isSidebarCollapsed = !isSidebarCollapsed;
+                applySidebarState();
+            }
+        }
+        function toggleMobileMenu() { sidebar.classList.toggle('open'); }
+         function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) userMenu.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', applySidebarState);
+        window.addEventListener('resize', applySidebarState);
+
+        // --- Lógica da Página de Configurações ---
+        let hasPendingDebt = true; // Variável de simulação
+        const deleteButton = document.getElementById('deleteAccountButton');
+        const debtStatusSpan = document.getElementById('debtStatus');
+        const deleteMessage = document.getElementById('delete-message');
+
+        function checkDebtStatus() {
+            if (hasPendingDebt) {
+                deleteButton.disabled = true;
+                debtStatusSpan.textContent = 'Pendente';
+                debtStatusSpan.className = 'font-semibold text-red-600';
+                deleteMessage.textContent = 'Você precisa quitar suas faturas pendentes antes de excluir a conta.';
+
+            } else {
+                deleteButton.disabled = false;
+                debtStatusSpan.textContent = 'Quitada';
+                debtStatusSpan.className = 'font-semibold text-green-600';
+                deleteMessage.textContent = 'Esta ação é irreversível e irá apagar todos os seus dados.';
+            }
+        }
+
+        function simulatePayDebt() {
+            hasPendingDebt = false;
+            alert('Dívida paga com sucesso! (Simulação). Agora você pode excluir sua conta.');
+            checkDebtStatus();
+        }
+
+        function handleAccountDeletion() {
+            if (hasPendingDebt) {
+                alert('Ação bloqueada. Por favor, pague suas faturas pendentes.');
+                return;
+            }
+
+            const confirmation = confirm('Tem a certeza ABSOLUTA que deseja excluir a sua conta? Todos os seus dados serão permanentemente apagados. Esta ação não pode ser desfeita.');
+            if (confirmation) {
+                const finalConfirmation = confirm('Esta é a sua última chance. Confirmar exclusão da conta?');
+                if (finalConfirmation) {
+                    alert('Conta excluída com sucesso. Você será redirecionado para a página de login.');
+                    // Em uma aplicação real, você faria uma chamada ao backend aqui.
+                    console.log('Excluindo conta...');
+                    window.location.href = 'Login.html';
+                }
+            }
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDebtStatus();
+        });
+
+    </script>
+</body>
+</html>

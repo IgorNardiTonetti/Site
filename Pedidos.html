@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - Quadro Kanban</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos da sidebar e layout principal (mantidos) */
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .user-info .ml-3, 
+        .sidebar.collapsed .collapse-btn-text {
+            display: none;
+        }
+        .sidebar.collapsed .nav-item,
+        .sidebar.collapsed .user-info, 
+        .sidebar.collapsed .collapse-btn-container button {
+            justify-content: center;
+        }
+         .sidebar.collapsed .user-info img {
+            margin-left: 0;
+        }
+        .content {
+            transition: all 0.3s ease;
+            margin-left: 16rem; /* 256px */
+        }
+        .content.expanded {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                z-index: 1000;
+                transform: translateX(-100%);
+                width: 256px; 
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed { 
+                width: 256px;
+            }
+            .sidebar.collapsed.open .nav-text,
+            .sidebar.collapsed.open .logo-text,
+            .sidebar.collapsed.open .user-info .ml-3,
+            .sidebar.collapsed.open .collapse-btn-text {
+                display: inline-block; 
+            }
+            .sidebar.collapsed.open .nav-item,
+            .sidebar.collapsed.open .user-info,
+            .sidebar.collapsed.open .collapse-btn-container button {
+                justify-content: flex-start; 
+            }
+            .content { margin-left: 0 !important; }
+            .content.expanded { margin-left: 0 !important; }
+            .mobile-menu-btn { display: block !important; }
+            .desktop-collapse-btn { display: none !important; }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Estilos específicos para o Kanban */
+        .kanban-board {
+            display: flex;
+            gap: 1.5rem; /* 24px */
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+        .kanban-column {
+            flex: 0 0 300px; /* Largura fixa para cada coluna */
+            background-color: #f4f5f7; /* Um cinza um pouco mais escuro para as colunas */
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .kanban-column-header {
+            padding: 1rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb; /* gray-200 */
+        }
+        .kanban-cards {
+            padding: 0.5rem;
+            min-height: 200px; /* Altura mínima para a área de drop */
+            transition: background-color 0.2s ease;
+        }
+        .kanban-card {
+            background-color: white;
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            cursor: grab;
+            transition: box-shadow 0.2s ease;
+        }
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+        .kanban-card.dragging {
+            opacity: 0.5;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .kanban-cards.drag-over {
+            background-color: #e0e7ff; /* indigo-100 */
+        }
+         /* Estilos para o Modal de Novo Pedido */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        
+        /* Estilos para Impressão */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar bg-indigo-800 text-white w-64 flex flex-col h-full fixed">
+            <!-- Logo, User Profile e Menu (mantidos como antes) -->
+             <div class="p-4 flex items-center border-b border-indigo-700">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <span class="logo-text ml-3 text-xl font-bold">Pedidos On</span>
+            </div>
+            <div class="user-info p-4 flex items-center border-b border-indigo-700 mb-2">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3">
+                    <div class="font-medium">Maria Silva</div>
+                    <div class="text-xs text-indigo-300">Admin</div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 hide-scrollbar">
+                <div class="space-y-1 px-3">
+                    <a href="Dashboard.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-home text-lg w-6"></i>
+                        <span class="nav-text ml-3">Dashboard</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-chart-line text-lg w-6"></i>
+                        <span class="nav-text ml-3">Analytics</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-users text-lg w-6"></i>
+                        <span class="nav-text ml-3">Clientes</span>
+                    </a>
+                    <a href="pedidos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-indigo-900 text-white"> <!-- Link Ativo -->
+                        <i class="fas fa-shopping-cart text-lg w-6"></i>
+                        <span class="nav-text ml-3">Pedidos</span>
+                        <span id="order-count-badge" class="nav-text ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span> 
+                    </a>
+                    <a href="produtos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-boxes text-lg w-6"></i>
+                        <span class="nav-text ml-3">Produtos</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-file-invoice-dollar text-lg w-6"></i>
+                        <span class="nav-text ml-3">Faturas</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-cog text-lg w-6"></i>
+                        <span class="nav-text ml-3">Configurações</span>
+                    </a>
+                </div>
+                <div class="px-3 mt-8">
+                    <div class="text-xs font-semibold text-indigo-300 uppercase tracking-wider px-4 mb-2 nav-text">Outros</div>
+                    <a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-question-circle text-lg w-6"></i>
+                        <span class="nav-text ml-3">Ajuda</span>
+                    </a>
+                    <a href="Login.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-sign-out-alt text-lg w-6"></i>
+                        <span class="nav-text ml-3">Sair</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="collapse-btn-container p-4 border-t border-indigo-700 desktop-collapse-btn">
+                <button onclick="toggleSidebar()" class="w-full flex items-center text-indigo-200 hover:text-white">
+                    <i id="collapseIcon" class="fas fa-chevron-left text-lg"></i>
+                    <span class="nav-text ml-2 collapse-btn-text">Recolher</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content flex-1 flex flex-col overflow-hidden"> 
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <button class="mobile-menu-btn hidden text-gray-500 hover:text-gray-600 focus:outline-none" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div class="flex-1 flex justify-between items-center">
+                        <h1 class="text-xl font-semibold text-gray-700">Fluxo de Pedidos</h1>
+                        <div class="ml-4 flex items-center space-x-4">
+                            <button onclick="openNewOrderModal()" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <i class="fas fa-plus mr-2"></i> Novo Pedido
+                            </button>
+                             <button class="relative p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="sr-only">Notificações</span>
+                                <span class="absolute top-1 right-1 h-2 w-2 mt-px mr-px rounded-full bg-red-500"></span>
+                            </button>
+                            <div class="relative">
+                                <button onclick="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none">
+                                    <span class="hidden sm:block text-sm font-medium text-gray-700">Maria Silva</span>
+                                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                                    </div>
+                                </button>
+                                <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                    <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configurações</a>
+                                    <a href="Login.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Page Content for Kanban Board -->
+            <main class="flex-1 overflow-x-auto p-6 bg-gray-100">
+                <div class="kanban-board">
+                    <!-- Coluna Pendente -->
+                    <div class="kanban-column" id="column-pending">
+                        <div class="kanban-column-header flex justify-between items-center">
+                            <span class="text-gray-700" id="pending-count">Pendente (0)</span>
+                            <i class="fas fa-ellipsis-h text-gray-500"></i>
+                        </div>
+                        <div class="kanban-cards hide-scrollbar" data-status="pending">
+                            <!-- Cards serão adicionados aqui via JavaScript -->
+                        </div>
+                    </div>
+                    <!-- Coluna Em Preparo -->
+                    <div class="kanban-column" id="column-preparing">
+                         <div class="kanban-column-header flex justify-between items-center">
+                            <span class="text-gray-700" id="preparing-count">Em Preparo (0)</span>
+                            <i class="fas fa-ellipsis-h text-gray-500"></i>
+                        </div>
+                        <div class="kanban-cards hide-scrollbar" data-status="preparing">
+                            <!-- Cards serão adicionados aqui via JavaScript -->
+                        </div>
+                    </div>
+                    <!-- Coluna Pronto para Entrega -->
+                    <div class="kanban-column" id="column-ready">
+                        <div class="kanban-column-header flex justify-between items-center">
+                            <span class="text-gray-700" id="ready-count">Pronto para Entrega (0)</span>
+                            <i class="fas fa-ellipsis-h text-gray-500"></i>
+                        </div>
+                        <div class="kanban-cards hide-scrollbar" data-status="ready">
+                             <!-- Cards serão adicionados aqui via JavaScript -->
+                        </div>
+                    </div>
+                     <!-- Coluna Finalizado -->
+                    <div class="kanban-column" id="column-done">
+                        <div class="kanban-column-header flex justify-between items-center">
+                            <span class="text-gray-700" id="done-count">Finalizado (0)</span>
+                            <i class="fas fa-ellipsis-h text-gray-500"></i>
+                        </div>
+                        <div class="kanban-cards hide-scrollbar" data-status="done">
+                              <!-- Cards serão adicionados aqui via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal para Novo Pedido -->
+    <div id="newOrderModal" class="modal-backdrop fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 transform scale-95 opacity-0 max-h-[95vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="flex-shrink-0 flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+                <h3 id="modalTitle" class="text-xl font-semibold text-gray-800">Criar Novo Pedido</h3>
+                <button onclick="closeNewOrderModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <form id="newOrderForm" class="flex-1 overflow-y-auto pr-2">
+                <input type="hidden" id="editingOrderId" value="">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="clientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                            <input type="text" id="clientName" placeholder="Nome do Cliente" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        </div>
+                        <div>
+                            <label for="clientPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone do Cliente</label>
+                            <input type="tel" id="clientPhone" placeholder="(00) 00000-0000" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Pedido</label>
+                        <div class="flex space-x-4">
+                            <div class="flex items-center">
+                                <input id="tipoEntrega" name="tipoPedido" type="radio" value="entrega" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" checked onchange="toggleOrderTypeFields()">
+                                <label for="tipoEntrega" class="ml-2 block text-sm text-gray-900">Entrega</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="tipoLocal" name="tipoPedido" type="radio" value="local" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" onchange="toggleOrderTypeFields()">
+                                <label for="tipoLocal" class="ml-2 block text-sm text-gray-900">Local</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="enderecoField">
+                        <label for="endereco" class="block text-sm font-medium text-gray-700 mb-1">Endereço de Entrega</label>
+                        <input type="text" id="endereco" placeholder="Rua, Número, Bairro" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+
+                    <div id="mesaField" class="hidden">
+                        <label for="mesa" class="block text-sm font-medium text-gray-700 mb-1">Número da Mesa</label>
+                        <input type="text" id="mesa" placeholder="Ex: 5" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    
+                    <!-- Seção de Produtos -->
+                    <div class="border-t pt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Itens do Pedido</label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <select id="productSelector" class="flex-grow w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></select>
+                            <input type="number" id="productQuantity" min="1" value="1" class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <button type="button" onclick="addProductToOrder()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="orderItemsList" class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-md p-2 bg-gray-50">
+                            <p id="orderItemsPlaceholder" class="text-xs text-gray-500 text-center p-4">Nenhum produto adicionado.</p>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Pagamento -->
+                    <div class="border-t pt-4 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Status do Pagamento</label>
+                                <div class="flex space-x-4">
+                                    <div class="flex items-center">
+                                        <input id="pgStatusNaoPago" name="paymentStatus" type="radio" value="nao_pago" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" checked>
+                                        <label for="pgStatusNaoPago" class="ml-2 block text-sm text-gray-900">Pagar na Entrega</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="pgStatusPago" name="paymentStatus" type="radio" value="pago" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                        <label for="pgStatusPago" class="ml-2 block text-sm text-gray-900">Pago</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Forma de Pagamento</label>
+                                <div class="flex space-x-4">
+                                    <div class="flex items-center">
+                                        <input id="pgMetodoDinheiro" name="paymentMethod" type="radio" value="dinheiro" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" onchange="toggleChangeField()">
+                                        <label for="pgMetodoDinheiro" class="ml-2 block text-sm text-gray-900">Dinheiro</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="pgMetodoCartao" name="paymentMethod" type="radio" value="cartao" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" checked onchange="toggleChangeField()">
+                                        <label for="pgMetodoCartao" class="ml-2 block text-sm text-gray-900">Cartão</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="trocoField" class="hidden">
+                             <label for="trocoPara" class="block text-sm font-medium text-gray-700 mb-1">Troco para (R$)</label>
+                             <input type="number" id="trocoPara" placeholder="50,00" min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4 flex items-center">
+                        <input id="prioridade" name="prioridade" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="prioridade" class="ml-2 block text-sm font-medium text-red-600">Marcar como Prioridade</label>
+                    </div>
+                </div>
+            </form>
+            <!-- Modal Footer -->
+            <div class="flex-shrink-0 mt-6 flex justify-between items-center pt-4 border-t border-gray-200">
+                 <div id="totalPriceDisplay" class="text-lg font-bold text-gray-800">Total: R$ 0,00</div>
+                 <div class="flex space-x-3">
+                    <button type="button" onclick="closeNewOrderModal()" class="px-4 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium transition duration-150 ease-in-out">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="handleCreateOrder()" class="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium transition duration-150 ease-in-out">
+                        <i id="modalSubmitIcon" class="fas fa-plus mr-2"></i><span id="modalSubmitText">Criar Pedido</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Scripts da Sidebar
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const collapseIcon = document.getElementById('collapseIcon');
+        let isSidebarCollapsed = false; 
+
+        function applySidebarState() {
+            if (window.innerWidth > 768) { 
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    content.style.marginLeft = '80px'; 
+                    if(collapseIcon) collapseIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.style.marginLeft = '16rem'; 
+                    if(collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            } else { 
+                 content.style.marginLeft = '0px';
+                 sidebar.classList.remove('collapsed'); 
+                 if(collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left'); 
+            }
+        }
+        function toggleSidebar() {
+            if (window.innerWidth > 768) { 
+                isSidebarCollapsed = !isSidebarCollapsed;
+                applySidebarState();
+            }
+        }
+        function toggleMobileMenu() { sidebar.classList.toggle('open'); }
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) userMenu.classList.toggle('hidden');
+        }
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const userButton = document.querySelector('button[onclick="toggleUserMenu()"]');
+            if (userMenu && userButton && !userMenu.classList.contains('hidden')) {
+                if (!userMenu.contains(event.target) && !userButton.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            }
+        });
+        window.addEventListener('resize', applySidebarState);
+        
+
+        // Lógica do Quadro Kanban
+        const columns = document.querySelectorAll('.kanban-cards');
+        
+        function addDragAndDropHandlers(card) {
+            card.addEventListener('dragstart', () => {
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                const cardId = card.dataset.id;
+                const newStatus = card.parentElement.dataset.status;
+                console.log(`Card ${cardId} foi movido para a coluna ${newStatus}.`);
+                updateAllCounts();
+            });
+        }
+        
+        columns.forEach(column => {
+            column.addEventListener('dragover', e => {
+                e.preventDefault();
+                column.classList.add('drag-over');
+                const afterElement = getDragAfterElement(column, e.clientY);
+                const draggable = document.querySelector('.dragging');
+                if (draggable) {
+                    if (afterElement == null) {
+                        column.appendChild(draggable);
+                    } else {
+                        column.insertBefore(draggable, afterElement);
+                    }
+                }
+            });
+
+             column.addEventListener('dragleave', () => {
+                column.classList.remove('drag-over');
+            });
+            column.addEventListener('drop', (e) => {
+                 e.preventDefault();
+                column.classList.remove('drag-over');
+            });
+        });
+
+        function getDragAfterElement(column, y) {
+            const draggableElements = [...column.querySelectorAll('.kanban-card:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+        
+        const statusTranslations = {
+            pending: 'Pendente',
+            preparing: 'Em Preparo',
+            ready: 'Pronto para Entrega',
+            done: 'Finalizado'
+        };
+
+        function updateAllCounts() {
+            let totalPending = 0;
+            for (const status in statusTranslations) {
+                const column = document.getElementById(`column-${status}`);
+                if (column) {
+                    const count = column.querySelectorAll('.kanban-card').length;
+                    const headerSpan = column.querySelector('.kanban-column-header span');
+                    headerSpan.textContent = `${statusTranslations[status]} (${count})`;
+                    if (status === 'pending' || status === 'preparing') { 
+                        totalPending += count;
+                    }
+                }
+            }
+            const orderBadge = document.getElementById('order-count-badge');
+            if(orderBadge) {
+                orderBadge.textContent = totalPending;
+                orderBadge.style.display = totalPending > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        // Lógica do Modal de Novo Pedido
+        const newOrderModal = document.getElementById('newOrderModal');
+        const newOrderForm = document.getElementById('newOrderForm');
+        const enderecoField = document.getElementById('enderecoField');
+        const mesaField = document.getElementById('mesaField');
+        const productSelector = document.getElementById('productSelector');
+        const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+        const orderItemsList = document.getElementById('orderItemsList');
+        const orderItemsPlaceholder = document.getElementById('orderItemsPlaceholder');
+        const trocoField = document.getElementById('trocoField');
+        let currentOrderItems = [];
+        
+        const listaDeProdutos = [
+            { name: "X-Burger Clássico", price: 18.50 },
+            { name: "Pizza Margherita Individual", price: 25.00 },
+            { name: "Porção de Batata Frita", price: 15.00 },
+            { name: "Suco de Laranja", price: 7.00 },
+            { name: "Brownie", price: 8.50 },
+            { name: "Açaí 500ml", price: 20.00 },
+            { name: "Refrigerante", price: 5.00 }
+        ];
+
+        function populateProductsSelect() {
+            productSelector.innerHTML = '<option value="" disabled selected>Selecione um produto...</option>'; 
+            listaDeProdutos.forEach(produto => {
+                const option = document.createElement('option');
+                option.value = produto.name;
+                option.textContent = `${produto.name} - R$ ${produto.price.toFixed(2)}`;
+                option.dataset.price = produto.price; 
+                productSelector.appendChild(option);
+            });
+        }
+        
+        function openNewOrderModal(editingCard = null) {
+            populateProductsSelect();
+            newOrderForm.reset(); 
+            currentOrderItems = [];
+            renderOrderItems();
+            document.getElementById('editingOrderId').value = '';
+            
+            document.getElementById('modalTitle').textContent = "Criar Novo Pedido";
+            document.getElementById('modalSubmitText').textContent = "Criar Pedido";
+            document.getElementById('modalSubmitIcon').className = "fas fa-plus mr-2";
+            
+            if (editingCard) {
+                document.getElementById('modalTitle').textContent = `Editar Pedido ${editingCard.dataset.id}`;
+                document.getElementById('modalSubmitText').textContent = "Salvar Alterações";
+                document.getElementById('modalSubmitIcon').className = "fas fa-save mr-2";
+
+                document.getElementById('editingOrderId').value = editingCard.dataset.id;
+                document.getElementById('clientName').value = editingCard.dataset.clientName;
+                document.getElementById('clientPhone').value = editingCard.dataset.clientPhone;
+                document.getElementById('prioridade').checked = (editingCard.dataset.isPriority === 'true');
+
+                if (editingCard.dataset.orderType === 'entrega') {
+                    document.getElementById('tipoEntrega').checked = true;
+                    document.getElementById('endereco').value = editingCard.dataset.locationInfo;
+                } else {
+                    document.getElementById('tipoLocal').checked = true;
+                    document.getElementById('mesa').value = editingCard.dataset.locationInfo;
+                }
+
+                document.querySelector(`input[name="paymentStatus"][value="${editingCard.dataset.paymentStatus}"]`).checked = true;
+                document.querySelector(`input[name="paymentMethod"][value="${editingCard.dataset.paymentMethod}"]`).checked = true;
+                if (editingCard.dataset.paymentMethod === 'dinheiro' && editingCard.dataset.changeFor) {
+                    document.getElementById('trocoPara').value = editingCard.dataset.changeFor;
+                }
+                
+                if(editingCard.dataset.items) {
+                    currentOrderItems = JSON.parse(editingCard.dataset.items);
+                    renderOrderItems();
+                }
+            }
+            
+            toggleOrderTypeFields();
+            toggleChangeField();
+            newOrderModal.classList.remove('hidden');
+            setTimeout(() => {
+                newOrderModal.classList.remove('opacity-0');
+                newOrderModal.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+
+        function closeNewOrderModal() {
+            newOrderModal.classList.add('opacity-0');
+            newOrderModal.querySelector('.modal-content').classList.add('scale-95', 'opacity-0');
+            setTimeout(() => newOrderModal.classList.add('hidden'), 300);
+        }
+
+        function toggleOrderTypeFields() {
+            if (document.getElementById('tipoEntrega').checked) {
+                enderecoField.style.display = 'block';
+                mesaField.style.display = 'none';
+            } else {
+                enderecoField.style.display = 'none';
+                mesaField.style.display = 'block';
+            }
+        }
+        
+        function toggleChangeField() {
+            if (document.getElementById('pgMetodoDinheiro').checked) {
+                trocoField.style.display = 'block';
+            } else {
+                trocoField.style.display = 'none';
+                document.getElementById('trocoPara').value = ''; 
+            }
+        }
+
+        function addProductToOrder() {
+            const selectedOption = productSelector.options[productSelector.selectedIndex];
+            if (!selectedOption || !selectedOption.value) {
+                alert('Por favor, selecione um produto.');
+                return;
+            }
+            const quantityInput = document.getElementById('productQuantity');
+            const quantity = parseInt(quantityInput.value, 10);
+            if (isNaN(quantity) || quantity < 1) {
+                alert('Por favor, insira uma quantidade válida.');
+                return;
+            }
+
+            const existingItem = currentOrderItems.find(item => item.name === selectedOption.value);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                currentOrderItems.push({
+                    name: selectedOption.value,
+                    price: parseFloat(selectedOption.dataset.price),
+                    quantity: quantity
+                });
+            }
+            renderOrderItems();
+        }
+
+        function renderOrderItems() {
+            orderItemsList.innerHTML = '';
+            if (currentOrderItems.length === 0) {
+                orderItemsPlaceholder.style.display = 'block';
+            } else {
+                orderItemsPlaceholder.style.display = 'none';
+                currentOrderItems.forEach((item, index) => {
+                    const subtotal = item.price * item.quantity;
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded-md';
+                    itemDiv.innerHTML = `
+                        <div>
+                            <span class="font-medium text-sm text-gray-800">${item.name}</span>
+                            <span class="text-xs text-gray-500 ml-2">(${item.quantity} x R$ ${item.price.toFixed(2)})</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="font-medium text-sm text-gray-900 mr-4">R$ ${subtotal.toFixed(2)}</span>
+                            <button type="button" onclick="removeOrderItem(${index})" class="text-red-500 hover:text-red-700" title="Remover Item">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                    orderItemsList.appendChild(itemDiv);
+                });
+            }
+            calculateTotal();
+        }
+        
+        function removeOrderItem(index) {
+            currentOrderItems.splice(index, 1);
+            renderOrderItems();
+        }
+
+        function calculateTotal() {
+            const totalPrice = currentOrderItems.reduce((total, item) => {
+                return total + (item.price * item.quantity);
+            }, 0);
+            totalPriceDisplay.textContent = `Total: R$ ${totalPrice.toFixed(2)}`;
+            return totalPrice;
+        }
+
+        function createOrderCard(orderData) {
+            const card = document.createElement('div');
+            card.className = 'kanban-card';
+            card.setAttribute('draggable', 'true');
+            // Armazenando todos os dados no card para a função de edição
+            card.dataset.id = orderData.id;
+            card.dataset.clientName = orderData.clientName;
+            card.dataset.clientPhone = orderData.clientPhone;
+            card.dataset.orderType = orderData.orderType;
+            card.dataset.locationInfo = orderData.locationInfo;
+            card.dataset.isPriority = orderData.isPriority;
+            card.dataset.items = JSON.stringify(orderData.items);
+            card.dataset.paymentStatus = orderData.paymentStatus;
+            card.dataset.paymentMethod = orderData.paymentMethod;
+            card.dataset.changeFor = orderData.changeFor;
+            card.dataset.totalPrice = orderData.totalPrice;
+            
+            const priorityBadge = orderData.isPriority 
+                ? `<span class="px-2 py-0.5 text-xs font-bold rounded-full bg-red-100 text-red-800 border border-red-300">Prioridade</span>` 
+                : '';
+            
+            const paymentStatusBadge = orderData.paymentStatus === 'pago'
+     v           ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800">Pago</span>`
+                : `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">Não Pago</span>`;
+
+            const paymentMethodBadge = orderData.paymentMethod === 'dinheiro'
+    ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Dinheiro${orderData.changeFor ? ` (Troco p/ R$ ${parseFloat(orderData.changeFor || orderData.totalPrice).toFixed(2)})` : ''}</span>`
+    : `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Cartão</span>`;
+
+            const locationText = orderData.orderType === 'entrega' ? `Endereço: ${orderData.locationInfo}` : `Mesa: ${orderData.locationInfo}`;
+
+            card.innerHTML = `
+    <div class="flex justify-between items-start mb-2">
+        <h3 class="font-semibold text-gray-800">${orderData.id}</h3>
+        ${priorityBadge}
+    </div>
+    <div class="text-sm text-gray-600 mb-1">
+        <p>Cliente: ${orderData.clientName}</p>
+        <p class="text-xs text-gray-500">Telefone: ${orderData.clientPhone && orderData.clientPhone.trim() ? orderData.clientPhone : 'Sem informações'}</p>
+    </div>
+    <p class="text-xs text-gray-500 mb-3">${locationText}</p>
+    <div class="text-xs text-gray-500 space-y-1 border-t pt-2 mt-2">
+        ${orderData.items.map(p => `<p>${p.quantity}x ${p.name}</p>`).join('')}
+    </div>
+    <div class="mt-2 text-xs text-gray-600 flex gap-2 items-center">
+        ${paymentStatusBadge} ${paymentMethodBadge}
+    </div>
+    <div class="mt-4 pt-3 border-t flex justify-between items-center text-xs text-gray-500">
+        <span class="font-semibold text-gray-800 text-sm">R$ ${orderData.totalPrice.toFixed(2)}</span>
+        <div class="flex items-center space-x-2">
+            <button onclick="printOrder('${orderData.id}')" class="text-gray-500 hover:text-indigo-600" title="Imprimir Pedido"><i class="fas fa-print"></i></button>
+            <button onclick="editOrder('${orderData.id}')" class="text-blue-600 hover:text-blue-800" title="Editar Pedido"><i class="fas fa-edit"></i></button>
+            <button onclick="this.closest('.kanban-card').remove(); updateAllCounts();" class="text-red-600 hover:text-red-800" title="Excluir Pedido"><i class="fas fa-trash"></i></button>
+        </div>
+    </div>
+`;
+            
+            addDragAndDropHandlers(card);
+            return card;
+        }
+
+        function editOrder(orderId) {
+            const cardToEdit = document.querySelector(`.kanban-card[data-id='${orderId}']`);
+            if (cardToEdit) {
+                openNewOrderModal(cardToEdit);
+            }
+        }
+
+        function handleCreateOrder() {
+            const editingId = document.getElementById('editingOrderId').value;
+            const clientName = document.getElementById('clientName').value;
+            const clientPhone = document.getElementById('clientPhone').value;
+            const orderType = document.querySelector('input[name="tipoPedido"]:checked').value;
+            const location = orderType === 'entrega' ? document.getElementById('endereco').value : document.getElementById('mesa').value;
+            const isPriority = document.getElementById('prioridade').checked;
+            const paymentStatus = document.querySelector('input[name="paymentStatus"]:checked').value;
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const changeFor = document.getElementById('trocoPara').value;
+
+            if (!clientName || currentOrderItems.length === 0) {
+                alert('Por favor, preencha o nome do cliente e adicione ao menos um produto.');
+                return;
+            }
+
+            const totalPrice = calculateTotal();
+            const orderId = editingId || `#PED${Math.floor(1000 + Math.random() * 9000)}`;
+
+            const orderData = {
+                id: orderId,
+                clientName,
+                clientPhone,
+                orderType,
+                locationInfo: location,
+                items: currentOrderItems,
+                isPriority,
+                totalPrice: totalPrice,
+                paymentStatus,
+                paymentMethod,
+                changeFor
+            };
+            
+            const newCard = createOrderCard(orderData);
+
+            if (editingId) {
+                const oldCard = document.querySelector(`.kanban-card[data-id='${editingId}']`);
+                if(oldCard) {
+                    oldCard.parentElement.insertBefore(newCard, oldCard);
+                    oldCard.remove();
+                }
+                 alert(`Pedido ${orderId} atualizado com sucesso!`);
+            } else {
+                document.querySelector('#column-pending .kanban-cards').appendChild(newCard);
+                alert(`Pedido ${orderId} para ${clientName} criado e adicionado ao quadro!`);
+            }
+            
+            updateAllCounts();
+            console.log('Dados do Pedido:', orderData);
+            
+            closeNewOrderModal();
+        }
+        
+        function printOrder(orderId) {
+            
+            const cardToPrint = document.querySelector(`.kanban-card[data-id='${orderId}']`);
+            if (!cardToPrint) return;
+
+            const orderData = cardToPrint.dataset;
+            const items = JSON.parse(orderData.items);
+            const totalPrice = parseFloat(orderData.totalPrice);
+            const locationText = orderData.orderType === 'entrega' ? `Endereço: ${orderData.locationInfo}` : `Mesa: ${orderData.locationInfo}`;
+            const paymentMethodText = orderData.paymentMethod === 'dinheiro' ? `Dinheiro (Troco p/ R$ ${parseFloat(orderData.changeFor || totalPrice).toFixed(2)})` : 'Cartão';
+            const paymentStatusText = orderData.paymentStatus === 'pago' ? 'PAGO' : 'PAGAR NA ENTREGA';
+
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Imprimir Pedido</title>');
+            printWindow.document.write('<style> body { font-family: monospace; } h1, h2 { text-align: center; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border-bottom: 1px dashed #ccc; padding: 4px; text-align: left; } .total { font-weight: bold; font-size: 1.2em; text-align: right; margin-top: 10px;} </style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(`<h1>Comprovativo de Pedido</h1>`);
+            printWindow.document.write(`<hr>`);
+            printWindow.document.write(`<p><strong>Pedido:</strong> ${orderData.id}</p>`);
+            printWindow.document.write(`<p><strong>Cliente:</strong> ${orderData.clientName}</p>`);
+            printWindow.document.write(`<p><strong>Telefone:</strong> ${orderData.clientPhone}</p>`);
+            printWindow.document.write(`<p><strong>Local:</strong> ${locationText}</p>`);
+            printWindow.document.write(`<p><strong>Pagamento:</strong> ${paymentStatusText} - ${paymentMethodText}</p>`);
+            printWindow.document.write(`<hr><h2>Itens</h2>`);
+            printWindow.document.write('<table><thead><tr><th>Qtd</th><th>Produto</th><th style="text-align: right;">Subtotal</th></tr></thead><tbody>');
+            items.forEach(item => {
+                printWindow.document.write(`<tr><td>${item.quantity}x</td><td>${item.name}</td><td style="text-align: right;">R$ ${(item.quantity * item.price).toFixed(2)}</td></tr>`);
+            });
+            printWindow.document.write('</tbody></table>');
+            printWindow.document.write(`<hr>`);
+            printWindow.document.write(`<p class="total">Total: R$ ${totalPrice.toFixed(2)}</p>`);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        }
+
+        document.addEventListener('DOMContentLoaded', updateAllCounts); 
+    </script>
+</body>
+</html>

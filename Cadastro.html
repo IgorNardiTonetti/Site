@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos On - Cadastro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .register-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        
+        .input-focus:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3);
+        }
+        
+        .password-strength {
+            height: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .password-toggle {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Estilos para mensagens da API */
+        .api-message {
+            padding: 0.75rem;
+            margin-top: 1rem; /* Adicionado para separar do botão */
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+        .api-message.success {
+            background-color: #d1fae5; /* Verde claro */
+            color: #065f46; /* Verde escuro */
+            border: 1px solid #6ee7b7;
+        }
+        .api-message.error {
+            background-color: #fee2e2; /* Vermelho claro */
+            color: #991b1b; /* Vermelho escuro */
+            border: 1px solid #fca5a5;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="hidden lg:block fixed inset-0 w-1/2 h-full">
+        <div class="register-gradient h-full flex items-center justify-center text-white">
+            <div class="max-w-md px-10">
+                <div class="flex items-center mb-8">
+                    <div class="bg-white text-indigo-600 p-2 rounded-lg mr-3">
+                        <i class="fas fa-shopping-bag text-xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold">Pedidos On</h1>
+                </div>
+                <h2 class="text-2xl font-bold mb-4">Junte-se a milhares de empresas</h2>
+                <p class="mb-8 opacity-90">Gerencie seus pedidos, estoque e clientes de forma simples e eficiente. Comece hoje mesmo!</p>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="bg-white bg-opacity-10 p-2 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </div>
+                        <span>Gerenciamento de pedidos em tempo real</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="bg-white bg-opacity-10 p-2 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </div>
+                        <span>Controle de estoque automatizado</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="bg-white bg-opacity-10 p-2 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </div>
+                        <span>Relatórios e análises completas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full lg:w-1/2 ml-auto">
+        <div class="max-w-md mx-4 sm:mx-auto bg-white rounded-xl shadow-md overflow-hidden sm:p-10 p-6">
+            <div class="lg:hidden flex items-center justify-center mb-8">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg mr-3">
+                    <i class="fas fa-shopping-bag text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Pedidos On</h1>
+            </div>
+            
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">Crie sua conta</h2>
+                <p class="text-gray-600">Preencha os campos abaixo para se registrar</p>
+            </div>
+            
+            <form id="registerForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input id="first-name" name="firstName" type="text" autocomplete="given-name" required 
+                                   class="input-focus pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-150 ease-in-out" 
+                                   placeholder="Seu nome">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">Sobrenome</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input id="last-name" name="lastName" type="text" autocomplete="family-name" required 
+                                   class="input-focus pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-150 ease-in-out" 
+                                   placeholder="Seu sobrenome">
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail (será seu usuário)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input id="email" name="email" type="email" autocomplete="email" required 
+                               class="input-focus pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-150 ease-in-out" 
+                               placeholder="seu@email.com">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-phone text-gray-400"></i>
+                        </div>
+                        <input id="phone" name="phone" type="tel" autocomplete="tel" 
+                               class="input-focus pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-150 ease-in-out" 
+                               placeholder="(00) 00000-0000">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input id="password" name="password" type="password" autocomplete="new-password" required 
+                               class="input-focus pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-150 ease-in-out" 
+                               placeholder="••••••••">
+                        <button type="button"
+                            class="absolute right-0 top-1/2 -translate-y-1/2 pr-3 flex items-center text-gray-400 hover:text-gray-500 password-toggle"
+                            id="togglePassword">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2 grid grid-cols-3 gap-1" id="password-strength">
+                        <div class="password-strength bg-gray-200 rounded" data-strength="0"></div>
+                        <div class="password-strength bg-gray-200 rounded" data-strength="1"></div>
+                        <div class="password-strength bg-gray-200 rounded" data-strength="2"></div>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500" id="password-hint">A senha deve conter letras, números e caractere especial</p>
+                </div>
+                
+                <div>
+                    <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" required 
+                               class="input-focus pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-150 ease-in-out" 
+                               placeholder="••••••••">
+                        <button type="button"
+                            class="absolute right-0 top-1/2 -translate-y-1/2 pr-3 flex items-center text-gray-400 hover:text-gray-500 password-toggle"
+                            id="toggleConfirmPassword">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                    <p class="mt-1 text-xs text-red-500 hidden" id="password-match-error">As senhas não coincidem</p>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="terms" name="terms" type="checkbox" required
+                               class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="terms" class="font-medium text-gray-700">Eu concordo com os <a href="#" class="text-indigo-600 hover:text-indigo-500">Termos de Serviço</a> e <a href="#" class="text-indigo-600 hover:text-indigo-500">Política de Privacidade</a></label>
+                    </div>
+                </div>
+                
+                <div>
+                    <button type="submit" 
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                        Criar conta
+                    </button>
+                </div>
+            </form>
+            <!-- Div para exibir mensagens da API -->
+            <div id="apiMessage" class="api-message" style="display: none;"></div>
+            
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Ou cadastre-se com</span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <div>
+                        <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-150 ease-in-out">
+                            <i class="fab fa-google text-red-500 mr-2"></i> Google
+                        </a>
+                    </div>
+                    <div>
+                        <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-150 ease-in-out">
+                            <i class="fab fa-facebook-f text-blue-600 mr-2"></i> Facebook
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Já tem uma conta?
+                    <a href="Login.html" class="font-medium text-indigo-600 hover:text-indigo-500">Faça login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const API_BASE_URL = 'http://localhost:3000'; // Certifique-se que seu backend está rodando nesta URL/porta
+
+            // Seletores de elementos do formulário
+            const registerForm = document.getElementById('registerForm');
+            const firstNameInput = document.getElementById('first-name');
+            const lastNameInput = document.getElementById('last-name');
+            const emailInput = document.getElementById('email');
+            // const phoneInput = document.getElementById('phone'); // Opcional, não usado pela API atual
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const termsCheckbox = document.getElementById('terms');
+            const apiMessageDiv = document.getElementById('apiMessage');
+
+            // Toggle password visibility
+            const togglePassword = document.querySelector('#togglePassword');
+            const toggleConfirmPassword = document.querySelector('#toggleConfirmPassword');
+
+            togglePassword.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                icon.classList.toggle('fa-eye-slash');
+                icon.classList.toggle('fa-eye');
+            });
+
+            toggleConfirmPassword.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                icon.classList.toggle('fa-eye-slash');
+                icon.classList.toggle('fa-eye');
+            });
+            
+            // Password strength indicator (lógica existente mantida)
+            passwordInput.addEventListener('input', function() {
+                const strengthBars = document.querySelectorAll('#password-strength .password-strength');
+                const passwordHint = document.getElementById('password-hint');
+                const value = this.value;
+
+                strengthBars.forEach(bar => {
+                    bar.className = 'password-strength bg-gray-200 rounded'; // Reset
+                });
+
+                let strength = 0;
+                if (value.length >= 8) strength++;
+                if (value.length >= 8 && /[A-Z]/.test(value)) strength++;
+                if (value.length >= 8 && /[A-Z]/.test(value) && /[0-9]/.test(value)) strength++;
+                if (value.length >= 8 && /[A-Z]/.test(value) && /[0-9]/.test(value) && /[^A-Za-z0-9]/.test(value)) strength = 4; // Max strength
+
+
+                if (value.length === 0) {
+                    passwordHint.textContent = 'A senha deve conter letras, números e caractere especial.';
+                    passwordHint.className = 'mt-1 text-xs text-gray-500';
+                } else if (strength <= 1) {
+                    strengthBars[0].classList.remove('bg-gray-200');
+                    strengthBars[0].classList.add('bg-red-500');
+                    passwordHint.textContent = 'Senha fraca';
+                    passwordHint.className = 'mt-1 text-xs text-red-500';
+                } else if (strength === 2) {
+                    for(let i=0; i<2; i++) {
+                        strengthBars[i].classList.remove('bg-gray-200');
+                        strengthBars[i].classList.add('bg-yellow-400');
+                    }
+                    passwordHint.textContent = 'Senha média';
+                    passwordHint.className = 'mt-1 text-xs text-yellow-500';
+                } else if (strength >= 3) { // Considera 3 ou 4 como forte
+                     for(let i=0; i<3; i++) {
+                        strengthBars[i].classList.remove('bg-gray-200');
+                        strengthBars[i].classList.add('bg-green-500');
+                    }
+                    passwordHint.textContent = 'Senha forte';
+                    passwordHint.className = 'mt-1 text-xs text-green-500';
+                }
+            });
+            
+            // Password match validation
+            confirmPasswordInput.addEventListener('input', function() {
+                const passwordMatchError = document.getElementById('password-match-error');
+                if (this.value !== passwordInput.value && passwordInput.value.length > 0) {
+                    passwordMatchError.classList.remove('hidden');
+                } else {
+                    passwordMatchError.classList.add('hidden');
+                }
+            });
+            
+            // Phone number mask (lógica existente mantida)
+            const phoneMaskInput = document.getElementById('phone'); // Renomeado para evitar conflito
+            phoneMaskInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length === 0) { e.target.value = ''; return; }
+                if (value.length > 11) value = value.substring(0, 11);
+                if (value.length <= 2) { value = value.replace(/^(\d{0,2})/, '($1'); }
+                else if (value.length <= 6) { value = value.replace(/^(\d{0,2})(\d{0,4})/, '($1) $2'); }
+                else if (value.length <= 10) { value = value.replace(/^(\d{0,2})(\d{0,4})(\d{0,4})/, '($1) $2-$3'); }
+                else { value = value.replace(/^(\d{0,2})(\d{0,5})(\d{0,4})/, '($1) $2-$3'); }
+                e.target.value = value;
+            });
+
+            // Função para exibir mensagens da API
+            function showApiMessage(message, isSuccess) {
+                apiMessageDiv.textContent = message;
+                apiMessageDiv.className = 'api-message ' + (isSuccess ? 'success' : 'error');
+                apiMessageDiv.style.display = 'block';
+            }
+
+            function hideApiMessage() {
+                apiMessageDiv.style.display = 'none';
+                apiMessageDiv.textContent = '';
+            }
+            
+            // Form submission
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Previne o envio padrão do formulário
+                hideApiMessage(); // Esconde mensagens anteriores
+
+                // Validações do lado do cliente antes de enviar para a API
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    showApiMessage('As senhas não coincidem. Por favor, verifique.', false);
+                    // document.getElementById('password-match-error').classList.remove('hidden'); // Já é tratado pelo input event
+                    return;
+                }
+                
+                if (!termsCheckbox.checked) {
+                    showApiMessage('Você deve aceitar os Termos de Serviço e Política de Privacidade para continuar.', false);
+                    return;
+                }
+
+                // Coleta os dados do formulário para enviar à API
+                const userData = {
+                    username: emailInput.value, // Usando email como username
+                    email: emailInput.value,
+                    password: passwordInput.value,
+                    nomeCompleto: `${firstNameInput.value} ${lastNameInput.value}`.trim(),
+                    // phone: phoneInput.value // Opcional, se sua API for tratar
+                };
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/usuarios/registrar`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(userData),
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) { // Status 201 Created
+                        showApiMessage(`Usuário ${result.user.username} registrado com sucesso! Redirecionando para login...`, true);
+                        registerForm.reset(); // Limpa o formulário
+                        setTimeout(() => {
+                            window.location.href = 'Login.html'; // Redireciona para a página de login
+                        }, 2000); // Espera 2 segundos antes de redirecionar
+                    } else {
+                        // Exibe a mensagem de erro vinda da API (ex: usuário já existe, erro de validação no backend)
+                        showApiMessage(result.error || `Erro ${response.status}: Não foi possível registrar.`, false);
+                    }
+                } catch (error) {
+                    console.error('Erro ao registrar:', error);
+                    showApiMessage('Erro de conexão ao tentar registrar. Verifique se o servidor backend está rodando e acessível.', false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

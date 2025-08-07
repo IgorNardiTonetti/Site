@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajuda e Suporte - Pedidos On</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; 
+        }
+        .sidebar { transition: all 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text, .sidebar.collapsed .user-info .ml-3, .sidebar.collapsed .collapse-btn-text { display: none; }
+        .sidebar.collapsed .nav-item, .sidebar.collapsed .user-info, .sidebar.collapsed .collapse-btn-container button { justify-content: center; }
+        .sidebar.collapsed .user-info img { margin-left: 0; }
+        .content { transition: all 0.3s ease; margin-left: 16rem; }
+        .content.expanded { margin-left: 80px; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; z-index: 1000; transform: translateX(-100%); width: 256px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar.collapsed { width: 256px; }
+            .sidebar.collapsed.open .nav-text, .sidebar.collapsed.open .logo-text, .sidebar.collapsed.open .user-info .ml-3, .sidebar.collapsed.open .collapse-btn-text { display: inline-block; }
+            .sidebar.collapsed.open .nav-item, .sidebar.collapsed.open .user-info, .sidebar.collapsed.open .collapse-btn-container button { justify-content: flex-start; }
+            .content { margin-left: 0 !important; }
+            .content.expanded { margin-left: 0 !important; }
+            .mobile-menu-btn { display: block !important; }
+            .desktop-collapse-btn { display: none !important; }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Estilo para Acordeão do FAQ */
+        .faq-question svg {
+            transition: transform 0.3s ease;
+        }
+        .faq-question.open svg {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <div class="sidebar bg-indigo-800 text-white w-64 flex flex-col h-full fixed">
+             <div class="p-4 flex items-center border-b border-indigo-700">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <span class="logo-text ml-3 text-xl font-bold">Pedidos On</span>
+            </div>
+            <div class="user-info p-4 flex items-center border-b border-indigo-700 mb-2">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3">
+                    <div class="font-medium">Maria Silva</div>
+                    <div class="text-xs text-indigo-300">Admin</div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 hide-scrollbar">
+                <div class="space-y-1 px-3">
+                    <a href="Dashboard.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-home text-lg w-6"></i><span class="nav-text ml-3">Dashboard</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-chart-line text-lg w-6"></i><span class="nav-text ml-3">Analytics</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-users text-lg w-6"></i><span class="nav-text ml-3">Clientes</span>
+                    </a>
+                    <a href="pedidos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-shopping-cart text-lg w-6"></i><span class="nav-text ml-3">Pedidos</span>
+                    </a>
+                    <a href="produtos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-boxes text-lg w-6"></i><span class="nav-text ml-3">Produtos</span>
+                    </a>
+                    <a href="faturas.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-file-invoice-dollar text-lg w-6"></i><span class="nav-text ml-3">Faturas</span>
+                    </a>
+                    <a href="configuracoes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-cog text-lg w-6"></i><span class="nav-text ml-3">Configurações</span>
+                    </a>
+                </div>
+                <div class="px-3 mt-8">
+                    <div class="text-xs font-semibold text-indigo-300 uppercase tracking-wider px-4 mb-2 nav-text">Outros</div>
+                    <a href="ajuda.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-indigo-900 text-white"> <i class="fas fa-question-circle text-lg w-6"></i><span class="nav-text ml-3">Ajuda</span>
+                    </a>
+                    <a href="Login.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-sign-out-alt text-lg w-6"></i><span class="nav-text ml-3">Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        
+        <div class="content flex-1 flex flex-col overflow-hidden"> 
+            <header class="bg-white shadow-sm flex-shrink-0">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <button class="mobile-menu-btn hidden text-gray-600 hover:text-indigo-600 focus:outline-none" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-700">Central de Ajuda</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button onclick="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none">
+                                <span class="hidden sm:block text-sm font-medium text-gray-700">Maria Silva</span>
+                                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                            </button>
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                                <a href="configuracoes.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configurações</a>
+                                <a href="Login.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <main class="flex-1 overflow-y-auto p-6 sm:p-8">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-gray-800">Como podemos ajudar?</h2>
+                        <p class="mt-2 text-lg text-gray-600">Encontre respostas rápidas ou entre em contato conosco.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <a href="mailto:suporte@pedidoson.com" class="bg-white rounded-xl shadow-md p-6 flex items-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                            <div class="p-4 bg-indigo-100 text-indigo-600 rounded-full">
+                                <i class="fas fa-envelope text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-800">E-mail de Suporte</h3>
+                                <p class="text-indigo-600">suporte@pedidoson.com</p>
+                            </div>
+                        </a>
+                         <a href="https://wa.me/5511999998888" target="_blank" class="bg-white rounded-xl shadow-md p-6 flex items-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                            <div class="p-4 bg-green-100 text-green-600 rounded-full">
+                                <i class="fab fa-whatsapp text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-800">WhatsApp de Suporte</h3>
+                                <p class="text-green-600">+55 (11) 99999-8888</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Perguntas Frequentes</h2>
+                        <div class="space-y-4">
+                            <div class="bg-white rounded-lg shadow-sm">
+                                <button class="faq-question w-full flex justify-between items-center text-left p-4 focus:outline-none">
+                                    <span class="font-semibold text-gray-700">Como a segurança dos meus dados é garantida?</span>
+                                    <i class="fas fa-chevron-down text-gray-500"></i>
+                                </button>
+                                <div class="faq-answer hidden p-4 border-t border-gray-200 text-gray-600">
+                                    <p>Utilizamos criptografia de ponta-a-ponta para todas as comunicações e os seus dados são armazenados em servidores seguros da AWS (Amazon Web Services), seguindo as melhores práticas de segurança do mercado. O acesso à sua conta é protegido por senha com hashing seguro.</p>
+                                </div>
+                            </div>
+                             <div class="bg-white rounded-lg shadow-sm">
+                                <button class="faq-question w-full flex justify-between items-center text-left p-4 focus:outline-none">
+                                    <span class="font-semibold text-gray-700">A equipe de suporte está disponível 24h?</span>
+                                    <i class="fas fa-chevron-down text-gray-500"></i>
+                                </button>
+                                <div class="faq-answer hidden p-4 border-t border-gray-200 text-gray-600">
+                                    <p>Nossa equipe de suporte técnico está disponível para ajudá-lo de segunda a sexta, das 8h às 18h. Para emergências ou problemas críticos fora do horário comercial, temos uma linha de plantão disponível para os assinantes do Plano Pro.</p>
+                                </div>
+                            </div>
+                             <div class="bg-white rounded-lg shadow-sm">
+                                <button class="faq-question w-full flex justify-between items-center text-left p-4 focus:outline-none">
+                                    <span class="font-semibold text-gray-700">Quais são as formas de pagamento da assinatura?</span>
+                                    <i class="fas fa-chevron-down text-gray-500"></i>
+                                </button>
+                                <div class="faq-answer hidden p-4 border-t border-gray-200 text-gray-600">
+                                    <p>Aceitamos todos os principais cartões de crédito (Visa, Mastercard, Amex) para o pagamento da sua assinatura. A cobrança é recorrente e processada de forma segura através do nosso parceiro de pagamentos. Você pode gerenciar seus cartões na página "Faturas".</p>
+                                </div>
+                            </div>
+                             <div class="bg-white rounded-lg shadow-sm">
+                                <button class="faq-question w-full flex justify-between items-center text-left p-4 focus:outline-none">
+                                    <span class="font-semibold text-gray-700">Como começo a cadastrar meus produtos?</span>
+                                    <i class="fas fa-chevron-down text-gray-500"></i>
+                                </button>
+                                <div class="faq-answer hidden p-4 border-t border-gray-200 text-gray-600">
+                                    <p>É muito simples! Navegue até a página "Produtos" no menu lateral. Primeiro, vá até a aba "Gerenciar Estoque" para cadastrar seus ingredientes. Depois, na aba "Cadastro de Produtos", você pode criar seus produtos (lanches, bebidas, etc.) e selecionar os ingredientes que acabou de cadastrar. Seus produtos aparecerão como cards na mesma página.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- Sidebar ---
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const collapseIcon = document.getElementById('collapseIcon');
+        let isSidebarCollapsed = false;
+
+        function applySidebarState() {
+            if (window.innerWidth > 768) {
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    content.classList.add('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.classList.remove('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            } else {
+                content.classList.remove('expanded');
+                sidebar.classList.remove('collapsed');
+                if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+            }
+        }
+        function toggleSidebar() {
+            if (window.innerWidth > 768) {
+                isSidebarCollapsed = !isSidebarCollapsed;
+                applySidebarState();
+            }
+        }
+        function toggleMobileMenu() { sidebar.classList.toggle('open'); }
+         function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) userMenu.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', applySidebarState);
+        window.addEventListener('resize', applySidebarState);
+
+        // --- Lógica do FAQ (Acordeão) ---
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(button => {
+            button.addEventListener('click', () => {
+                const answer = button.nextElementSibling;
+                
+                button.classList.toggle('open');
+                
+                if (answer.classList.contains('hidden')) {
+                    answer.classList.remove('hidden');
+                } else {
+                    answer.classList.add('hidden');
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

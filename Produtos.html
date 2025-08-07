@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos e Estoque - Pedidos On</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* Um cinza um pouco mais claro */
+        }
+        .sidebar { transition: all 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text, .sidebar.collapsed .user-info .ml-3, .sidebar.collapsed .collapse-btn-text { display: none; }
+        .sidebar.collapsed .nav-item, .sidebar.collapsed .user-info, .sidebar.collapsed .collapse-btn-container button { justify-content: center; }
+        .sidebar.collapsed .user-info img { margin-left: 0; }
+        .content { transition: all 0.3s ease; margin-left: 16rem; }
+        .content.expanded { margin-left: 80px; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; z-index: 1000; transform: translateX(-100%); width: 256px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar.collapsed { width: 256px; }
+            .sidebar.collapsed.open .nav-text, .sidebar.collapsed.open .logo-text, .sidebar.collapsed.open .user-info .ml-3, .sidebar.collapsed.open .collapse-btn-text { display: inline-block; }
+            .sidebar.collapsed.open .nav-item, .sidebar.collapsed.open .user-info, .sidebar.collapsed.open .collapse-btn-container button { justify-content: flex-start; }
+            .content { margin-left: 0 !important; }
+            .content.expanded { margin-left: 0 !important; }
+            .mobile-menu-btn { display: block !important; }
+            .desktop-collapse-btn { display: none !important; }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Estilos para Modais e Formulários */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px #a5b4fc;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar bg-indigo-800 text-white w-64 flex-col h-full fixed hidden sm:flex">
+             <div class="p-4 flex items-center border-b border-indigo-700">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <span class="logo-text ml-3 text-xl font-bold">Pedidos On</span>
+            </div>
+            <div class="user-info p-4 flex items-center border-b border-indigo-700 mb-2">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3">
+                    <div class="font-medium">Maria Silva</div>
+                    <div class="text-xs text-indigo-300">Admin</div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 hide-scrollbar">
+                <div class="space-y-1 px-3">
+                    <a href="Dashboard.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-home text-lg w-6"></i><span class="nav-text ml-3">Dashboard</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-chart-line text-lg w-6"></i><span class="nav-text ml-3">Analytics</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-users text-lg w-6"></i><span class="nav-text ml-3">Clientes</span>
+                    </a>
+                    <a href="pedidos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-shopping-cart text-lg w-6"></i><span class="nav-text ml-3">Pedidos</span>
+                    </a>
+                    <a href="produtos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-indigo-900 text-white">
+                        <i class="fas fa-boxes text-lg w-6"></i><span class="nav-text ml-3">Produtos</span>
+                    </a>
+                    <a href="faturas.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-file-invoice-dollar text-lg w-6"></i><span class="nav-text ml-3">Faturas</span>
+                    </a>
+                    <a href="configuracoes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-cog text-lg w-6"></i><span class="nav-text ml-3">Configurações</span>
+                    </a>
+                </div>
+                <div class="px-3 mt-8">
+                    <div class="text-xs font-semibold text-indigo-300 uppercase tracking-wider px-4 mb-2 nav-text">Outros</div>
+                    <a href="ajuda.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-question-circle text-lg w-6"></i>
+                        <span class="nav-text ml-3">Ajuda</span>
+                    </a>
+                    <a href="Login.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-sign-out-alt text-lg w-6"></i>
+                        <span class="nav-text ml-3">Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content flex-1 flex flex-col overflow-hidden"> 
+            <header class="bg-white shadow-sm flex-shrink-0">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <button class="mobile-menu-btn hidden text-gray-600 hover:text-indigo-600 focus:outline-none" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-700">Produtos e Estoque</h1>
+                    <div class="flex items-center space-x-4">
+                         <button onclick="openStockModal()" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-warehouse mr-2"></i> Gerenciar Estoque
+                        </button>
+                        <button onclick="openProductModal()" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-plus mr-2"></i> Novo Produto
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <main class="flex-1 overflow-y-auto p-6 sm:p-8">
+                <div class="mb-6">
+                    <input type="text" id="searchProductsInput" placeholder="Buscar produtos pelo nome..." class="w-full sm:w-1/2 lg:w-1/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <!-- Lista de Produtos -->
+                <div id="productList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Cards de produto serão inseridos aqui via JavaScript -->
+                </div>
+                 <div id="no-products-message" class="hidden text-center py-10">
+                    <i class="fas fa-box-open text-5xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-600">Nenhum produto cadastrado.</p>
+                    <p class="text-sm text-gray-500">Clique em "Novo Produto" para começar.</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionar/Editar Produto -->
+    <div id="productModal" class="modal-backdrop fixed inset-0 flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-lg mx-4 transform scale-95 max-h-[90vh] flex flex-col">
+            <div class="flex-shrink-0 flex justify-between items-center pb-3 border-b border-gray-200">
+                <h3 id="productModalTitle" class="text-xl font-semibold text-gray-800">Adicionar Novo Produto</h3>
+                <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="productForm" class="flex-1 overflow-y-auto py-6 space-y-4">
+                <input type="hidden" id="editingProductId">
+                <div>
+                    <label for="produtoNome" class="block text-sm font-medium text-gray-700">Nome do Produto</label>
+                    <input type="text" id="produtoNome" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                </div>
+                <div>
+                    <label for="produtoDescricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                    <textarea id="produtoDescricao" rows="3" class="mt-1 form-textarea w-full px-3 py-2 rounded-md"></textarea>
+                </div>
+                 <div>
+                    <label for="produtoPreco" class="block text-sm font-medium text-gray-700">Preço (R$)</label>
+                    <input type="number" id="produtoPreco" step="0.01" min="0" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                </div>
+                 <div>
+                    <label for="produtoFoto" class="block text-sm font-medium text-gray-700">URL da Foto</label>
+                    <input type="url" id="produtoFoto" placeholder="https://exemplo.com/foto.jpg" class="mt-1 form-input w-full px-3 py-2 rounded-md">
+                </div>
+                <div>
+                     <label class="block text-sm font-medium text-gray-700 mb-1">Ingredientes</label>
+                     <div class="relative">
+                         <input type="text" id="ingredientSearch" placeholder="Buscar ingrediente..." class="form-input w-full px-3 py-2 rounded-md mb-2">
+                     </div>
+                     <div id="ingredientsCheckboxContainer" class="max-h-40 overflow-y-auto border border-gray-200 rounded-md p-3 space-y-2">
+                        <!-- Checkboxes de ingredientes serão inseridos aqui -->
+                     </div>
+                </div>
+            </form>
+             <div class="flex-shrink-0 flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <button type="button" onclick="closeProductModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium text-sm">Cancelar</button>
+                <button type="button" onclick="saveProduct()" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium text-sm">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Gerenciar Estoque -->
+    <div id="stockModal" class="modal-backdrop fixed inset-0 flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-2xl mx-4 transform scale-95 max-h-[90vh] flex flex-col">
+            <div class="flex-shrink-0 flex justify-between items-center pb-3 border-b border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-800">Gerenciar Estoque de Ingredientes</h3>
+                <button onclick="closeStockModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto py-6">
+                <form id="stockForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end mb-6">
+                    <div class="sm:col-span-2">
+                        <label for="stockItemName" class="block text-sm font-medium text-gray-700">Nome do Ingrediente</label>
+                        <input type="text" id="stockItemName" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                    </div>
+                     <div class="flex-shrink-0">
+                        <label for="stockItemQuantity" class="block text-sm font-medium text-gray-700">Quantidade</label>
+                        <input type="number" id="stockItemQuantity" value="0" min="0" class="mt-1 form-input w-full px-3 py-2 rounded-md" required>
+                    </div>
+                     <div class="flex-shrink-0">
+                        <label for="stockItemUnit" class="block text-sm font-medium text-gray-700">Unidade</label>
+                        <select id="stockItemUnit" class="mt-1 form-select w-full px-3 py-2 rounded-md">
+                            <option>un</option>
+                            <option>kg</option>
+                            <option>g</option>
+                            <option>L</option>
+                            <option>ml</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="sm:col-start-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium"><i class="fas fa-plus mr-2"></i>Adicionar</button>
+                </form>
+                <div id="stockList" class="space-y-2">
+                    <!-- Itens de estoque serão inseridos aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Sidebar ---
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const collapseIcon = document.getElementById('collapseIcon');
+        let isSidebarCollapsed = false;
+
+        function applySidebarState() {
+            if (window.innerWidth > 768) {
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    content.classList.add('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.classList.remove('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            } else {
+                content.classList.remove('expanded');
+                sidebar.classList.remove('collapsed');
+                if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+            }
+        }
+        function toggleSidebar() {
+            if (window.innerWidth > 768) {
+                isSidebarCollapsed = !isSidebarCollapsed;
+                applySidebarState();
+            }
+        }
+        function toggleMobileMenu() { sidebar.classList.toggle('open'); }
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if(userMenu) userMenu.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', applySidebarState);
+        window.addEventListener('resize', applySidebarState);
+
+        // --- Dados de Exemplo (Simulação de Banco de Dados) ---
+        let stockItems = [
+            { id: 1, name: 'Pão de Hambúrguer', unit: 'un', quantity: 100 },
+            { id: 2, name: 'Carne de Hambúrguer 180g', unit: 'un', quantity: 80 },
+            { id: 3, name: 'Queijo Cheddar', unit: 'fatias', quantity: 200 },
+            { id: 4, name: 'Alface Americana', unit: 'un', quantity: 10 },
+            { id: 5, name: 'Tomate', unit: 'kg', quantity: 5 },
+            { id: 6, name: 'Molho Especial', unit: 'L', quantity: 2 },
+            { id: 7, name: 'Massa de Pizza', unit: 'un', quantity: 30 },
+            { id: 8, name: 'Queijo Mozzarella', unit: 'kg', quantity: 8 },
+            { id: 9, name: 'Manjericão', unit: 'maços', quantity: 4 },
+        ];
+        
+        let products = [
+            {
+                id: 'prod1',
+                name: 'X-Burger Clássico',
+                description: 'Pão artesanal, hambúrguer de picanha 180g, queijo cheddar, alface, tomate e molho especial.',
+                price: 18.50,
+                imageUrl: 'https://placehold.co/400x300/EBF4FF/7F9CF5?text=X-Burger',
+                ingredients: ['Pão de Hambúrguer', 'Carne de Hambúrguer 180g', 'Queijo Cheddar', 'Alface Americana']
+            },
+             {
+                id: 'prod2',
+                name: 'Pizza Margherita Individual',
+                description: 'Massa fina de fermentação natural, molho de tomate italiano, mozzarella e manjericão.',
+                price: 25.00,
+                imageUrl: 'https://placehold.co/400x300/FEF3C7/F59E0B?text=Pizza',
+                ingredients: ['Massa de Pizza', 'Queijo Mozzarella', 'Manjericão']
+            }
+        ];
+
+        // --- Lógica da Página de Produtos ---
+        const productListDiv = document.getElementById('productList');
+        const noProductsMessage = document.getElementById('no-products-message');
+        const searchProductsInput = document.getElementById('searchProductsInput');
+        
+        function renderProducts(filter = '') {
+            productListDiv.innerHTML = '';
+            const filteredProducts = products.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+
+            if (filteredProducts.length === 0) {
+                noProductsMessage.style.display = 'block';
+            } else {
+                noProductsMessage.style.display = 'none';
+                filteredProducts.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300';
+                    card.innerHTML = `
+                        <img src="${product.imageUrl}" alt="${product.name}" class="h-40 w-full object-cover">
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg text-gray-800">${product.name}</h3>
+                            <p class="text-sm text-gray-600 h-10 overflow-hidden">${product.description}</p>
+                            <div class="mt-2 space-x-1">
+                                ${product.ingredients.slice(0, 3).map(ing => `<span class="inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700">${ing}</span>`).join('')}
+                            </div>
+                            <div class="mt-4 flex justify-between items-center">
+                                <span class="text-xl font-bold text-indigo-600">R$ ${product.price.toFixed(2)}</span>
+                                <div class="space-x-2">
+                                    <button onclick="openProductModal('${product.id}')" class="text-blue-500 hover:text-blue-700" title="Editar"><i class="fas fa-edit"></i></button>
+                                    <button onclick="deleteProduct('${product.id}')" class="text-red-500 hover:text-red-700" title="Excluir"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productListDiv.appendChild(card);
+                });
+            }
+        }
+        
+        searchProductsInput.addEventListener('input', (e) => renderProducts(e.target.value));
+
+        // --- Lógica do Modal de Produtos ---
+        const productModal = document.getElementById('productModal');
+        const productForm = document.getElementById('productForm');
+        const ingredientsCheckboxContainer = document.getElementById('ingredientsCheckboxContainer');
+        const ingredientSearchInput = document.getElementById('ingredientSearch');
+
+        function openProductModal(productId = null) {
+            productForm.reset();
+            document.getElementById('editingProductId').value = productId || '';
+            
+            if (productId) {
+                const product = products.find(p => p.id === productId);
+                document.getElementById('productModalTitle').textContent = 'Editar Produto';
+                document.getElementById('produtoNome').value = product.name;
+                document.getElementById('produtoDescricao').value = product.description;
+                document.getElementById('produtoPreco').value = product.price;
+                document.getElementById('produtoFoto').value = product.imageUrl;
+                renderIngredientCheckboxes(product.ingredients);
+            } else {
+                document.getElementById('productModalTitle').textContent = 'Adicionar Novo Produto';
+                renderIngredientCheckboxes();
+            }
+            
+            productModal.classList.remove('hidden');
+            setTimeout(() => productModal.classList.remove('opacity-0'), 10);
+            setTimeout(() => productModal.querySelector('.modal-content').classList.remove('scale-95'), 10);
+        }
+
+        function closeProductModal() {
+            productModal.classList.add('opacity-0');
+            productModal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => productModal.classList.add('hidden'), 300);
+        }
+        
+        function renderIngredientCheckboxes(selectedIngredients = [], filter = '') {
+            ingredientsCheckboxContainer.innerHTML = '';
+            const filteredStock = stockItems.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
+            
+            filteredStock.forEach(item => {
+                const isChecked = selectedIngredients.includes(item.name);
+                const div = document.createElement('div');
+                div.className = 'flex items-center';
+                div.innerHTML = `
+                    <input id="ing-${item.id}" name="ingredients" value="${item.name}" type="checkbox" ${isChecked ? 'checked' : ''} class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="ing-${item.id}" class="ml-2 block text-sm text-gray-900">${item.name}</label>
+                `;
+                ingredientsCheckboxContainer.appendChild(div);
+            });
+        }
+        
+        ingredientSearchInput.addEventListener('input', (e) => {
+            const selected = Array.from(document.querySelectorAll('input[name="ingredients"]:checked')).map(cb => cb.value);
+            renderIngredientCheckboxes(selected, e.target.value);
+        });
+
+        function saveProduct() {
+            const id = document.getElementById('editingProductId').value;
+            const name = document.getElementById('produtoNome').value;
+            const description = document.getElementById('produtoDescricao').value;
+            const price = parseFloat(document.getElementById('produtoPreco').value);
+            const imageUrl = document.getElementById('produtoFoto').value;
+            const ingredients = Array.from(document.querySelectorAll('input[name="ingredients"]:checked')).map(cb => cb.value);
+            
+            if (!name || !price) {
+                alert("Nome e preço do produto são obrigatórios.");
+                return;
+            }
+
+            if (id) { // Editando
+                const productIndex = products.findIndex(p => p.id === id);
+                products[productIndex] = { ...products[productIndex], name, description, price, imageUrl, ingredients };
+            } else { // Criando
+                const newProduct = {
+                    id: `prod${Date.now()}`,
+                    name, description, price, imageUrl, ingredients
+                };
+                products.push(newProduct);
+            }
+            
+            renderProducts();
+            closeProductModal();
+        }
+        
+        function deleteProduct(productId) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                products = products.filter(p => p.id !== productId);
+                renderProducts();
+            }
+        }
+
+        // --- Lógica do Modal de Estoque ---
+        const stockModal = document.getElementById('stockModal');
+        const stockForm = document.getElementById('stockForm');
+        const stockListDiv = document.getElementById('stockList');
+        
+        function openStockModal() {
+            renderStockItems();
+            stockModal.classList.remove('hidden');
+            setTimeout(() => stockModal.classList.remove('opacity-0'), 10);
+            setTimeout(() => stockModal.querySelector('.modal-content').classList.remove('scale-95'), 10);
+        }
+        
+        function closeStockModal() {
+            stockModal.classList.add('opacity-0');
+            stockModal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => stockModal.classList.add('hidden'), 300);
+        }
+        
+        function renderStockItems() {
+            stockListDiv.innerHTML = '';
+            if (stockItems.length === 0) {
+                 stockListDiv.innerHTML = `<p class="text-center text-gray-500">Nenhum item em estoque.</p>`;
+                 return;
+            }
+            const table = document.createElement('table');
+            table.className = 'min-w-full divide-y divide-gray-200';
+            table.innerHTML = `
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ingrediente</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                </tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+            stockItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${item.quantity} ${item.unit}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium space-x-3">
+                        <button onclick="deleteStockItem(${item.id})" class="text-red-500 hover:text-red-700" title="Excluir Item do Estoque"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            stockListDiv.appendChild(table);
+        }
+        
+        stockForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('stockItemName').value;
+            const unit = document.getElementById('stockItemUnit').value;
+            const quantity = parseFloat(document.getElementById('stockItemQuantity').value) || 0;
+            
+            if(name && unit) {
+                const existingItem = stockItems.find(item => item.name.toLowerCase() === name.toLowerCase());
+                if (existingItem) {
+                    alert('Este ingrediente já existe. A quantidade será somada.');
+                    existingItem.quantity += quantity;
+                } else {
+                    stockItems.push({ id: Date.now(), name, unit, quantity });
+                }
+                renderStockItems();
+                stockForm.reset();
+                document.getElementById('stockItemQuantity').value = 0;
+            }
+        });
+        
+        function deleteStockItem(itemId) {
+             if (confirm('Tem certeza que deseja excluir este ingrediente do estoque?')) {
+                stockItems = stockItems.filter(item => item.id !== itemId);
+                renderStockItems();
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+        });
+
+    </script>
+</body>
+</html>

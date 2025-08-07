@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Pedidos On</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos da sidebar e layout principal */
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .user-info .ml-3, 
+        .sidebar.collapsed .collapse-btn-text {
+            display: none;
+        }
+        .sidebar.collapsed .nav-item,
+        .sidebar.collapsed .user-info, 
+        .sidebar.collapsed .collapse-btn-container button {
+            justify-content: center;
+        }
+         .sidebar.collapsed .user-info img {
+            margin-left: 0;
+        }
+
+
+        .content {
+            transition: all 0.3s ease;
+            margin-left: 16rem; /* 256px, largura da sidebar */
+        }
+        .content.expanded { /* Quando a sidebar está colapsada */
+            margin-left: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                z-index: 1000;
+                transform: translateX(-100%);
+                width: 256px; /* Largura padrão da sidebar no mobile */
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed { /* No mobile, 'collapsed' não deve reduzir a largura quando aberta */
+                width: 256px;
+            }
+            .sidebar.collapsed.open .nav-text,
+            .sidebar.collapsed.open .logo-text,
+            .sidebar.collapsed.open .user-info .ml-3,
+            .sidebar.collapsed.open .collapse-btn-text {
+                display: inline-block; 
+            }
+            .sidebar.collapsed.open .nav-item,
+            .sidebar.collapsed.open .user-info,
+            .sidebar.collapsed.open .collapse-btn-container button {
+                justify-content: flex-start; 
+            }
+
+            .content {
+                margin-left: 0 !important;
+            }
+            .content.expanded { /* Não aplicar margem expandida no mobile */
+                 margin-left: 0 !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+            }
+            .desktop-collapse-btn { /* Esconde o botão de colapsar do desktop no mobile */
+                display: none !important;
+            }
+        }
+
+        /* Classe para esconder a barra de rolagem */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none; /* WebKit (Chrome, Safari, Edge) */
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE e Edge legado */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar bg-indigo-800 text-white w-64 flex flex-col h-full fixed">
+            <!-- Logo and Brand -->
+            <div class="p-4 flex items-center border-b border-indigo-700">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <span class="logo-text ml-3 text-xl font-bold">Pedidos On</span>
+            </div>
+            
+            <!-- User Profile -->
+            <div class="user-info p-4 flex items-center border-b border-indigo-700 mb-2">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3">
+                    <div class="font-medium">Maria Silva</div>
+                    <div class="text-xs text-indigo-300">Admin</div>
+                </div>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="flex-1 overflow-y-auto py-4 hide-scrollbar"> 
+                <div class="space-y-1 px-3">
+                    <a href="Dashboard.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-home text-lg w-6"></i>
+                        <span class="nav-text ml-3">Dashboard</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-indigo-900 text-white"> 
+                        <i class="fas fa-chart-line text-lg w-6"></i>
+                        <span class="nav-text ml-3">Analytics</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-users text-lg w-6"></i>
+                        <span class="nav-text ml-3">Clientes</span>
+                    </a>
+                    <a href="pedidos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-shopping-cart text-lg w-6"></i>
+                        <span class="nav-text ml-3">Pedidos</span>
+                        <span class="nav-text ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                    </a>
+                    <a href="produtos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-boxes text-lg w-6"></i>
+                        <span class="nav-text ml-3">Produtos</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-file-invoice-dollar text-lg w-6"></i>
+                        <span class="nav-text ml-3">Faturas</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-cog text-lg w-6"></i>
+                        <span class="nav-text ml-3">Configurações</span>
+                    </a>
+                </div>
+                
+                <div class="px-3 mt-8">
+                    <div class="text-xs font-semibold text-indigo-300 uppercase tracking-wider px-4 mb-2 nav-text">Outros</div>
+                    <a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-question-circle text-lg w-6"></i>
+                        <span class="nav-text ml-3">Ajuda</span>
+                    </a>
+                    <a href="Login.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white"> 
+                        <i class="fas fa-sign-out-alt text-lg w-6"></i>
+                        <span class="nav-text ml-3">Sair</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <!-- Collapse Button -->
+            <div class="collapse-btn-container p-4 border-t border-indigo-700 desktop-collapse-btn">
+                <button onclick="toggleSidebar()" class="w-full flex items-center text-indigo-200 hover:text-white">
+                    <i id="collapseIcon" class="fas fa-chevron-left text-lg"></i>
+                    <span class="nav-text ml-2 collapse-btn-text">Recolher</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content flex-1 flex flex-col overflow-hidden"> 
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <button class="mobile-menu-btn hidden text-gray-500 hover:text-gray-600 focus:outline-none" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    
+                    <div class="flex-1 flex justify-between items-center">
+                        <div class="relative max-w-md w-full">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Buscar...">
+                        </div>
+                        
+                        <div class="ml-4 flex items-center space-x-4">
+                            <button class="relative p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="sr-only">Notificações</span>
+                                <span class="absolute top-1 right-1 h-2 w-2 mt-px mr-px rounded-full bg-red-500"></span>
+                            </button>
+                            
+                            <div class="relative">
+                                <button onclick="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none">
+                                    <span class="hidden sm:block text-sm font-medium text-gray-700">Maria Silva</span>
+                                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                                    </div>
+                                </button>
+                                
+                                <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                    <a href="Perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configurações</a>
+                                    <a href="Login.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Page Content for Analytics -->
+            <main class="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-indigo-50 via-white to-indigo-100">
+                <div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                    <h1 class="text-3xl font-extrabold text-indigo-900 tracking-tight">Painel de Analytics</h1>
+                    <div class="flex space-x-3">
+                        <input type="date" class="px-4 py-2 bg-white border border-indigo-200 rounded-lg text-sm font-medium text-gray-700 shadow focus:outline-none focus:ring-2 focus:ring-indigo-500" value="2023-06-01">
+                        <span class="self-center text-gray-600">até</span>
+                        <input type="date" class="px-4 py-2 bg-white border border-indigo-200 rounded-lg text-sm font-medium text-gray-700 shadow focus:outline-none focus:ring-2 focus:ring-indigo-500" value="2023-06-15">
+                        <button class="px-4 py-2 bg-indigo-600 border border-transparent rounded-lg text-sm font-semibold text-white shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <i class="fas fa-filter mr-2"></i> Aplicar Filtro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gráfico Resumo do Período -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8 flex flex-col items-center">
+                    <h2 class="text-lg font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-chart-pie text-indigo-500"></i> Resumo do Período
+                    </h2>
+                    <div class="w-64 max-w-full">
+                        <canvas id="resumoGrafico" height="180" width="180"></canvas>
+                    </div>
+                </div>
+
+                <!-- Produtos Mais Vendidos -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-lg font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-fire text-orange-500"></i> Produtos Mais Vendidos
+                    </h2>
+                    <ul id="produtosMaisVendidos" class="space-y-2">
+                        <li class="flex justify-between items-center">
+                            <span class="font-medium text-gray-700">Açaí Tradicional</span>
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">120 vendas</span>
+                        </li>
+                        <li class="flex justify-between items-center">
+                            <span class="font-medium text-gray-700">Pizza Calabresa</span>
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">98 vendas</span>
+                        </li>
+                        <li class="flex justify-between items-center">
+                            <span class="font-medium text-gray-700">Hambúrguer Artesanal</span>
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">85 vendas</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Produtos Menos Vendidos -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-lg font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-arrow-down text-red-500"></i> Produtos Menos Vendidos
+                    </h2>
+                    <ul id="produtosMenosVendidos" class="space-y-2">
+                        <li class="flex justify-between items-center">
+                            <span class="font-medium text-gray-700">Suco Detox</span>
+                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">8 vendas</span>
+                        </li>
+                        <li class="flex justify-between items-center">
+                            <span class="font-medium text-gray-700">Salada Caesar</span>
+                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">12 vendas</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Estoque Atual -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-lg font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-boxes text-indigo-500"></i> Estoque Atual
+                    </h2>
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-indigo-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-indigo-700 uppercase">Produto</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-indigo-700 uppercase">Estoque</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-indigo-700 uppercase">Alerta</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">Açaí Tradicional</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">15</td>
+                                <td class="px-4 py-2 text-sm"><span class="px-2 py-1 rounded bg-red-100 text-red-700 font-bold">Baixo estoque</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">Pizza Calabresa</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">50</td>
+                                <td class="px-4 py-2 text-sm"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Margem de Lucro por Produto -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-lg font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-percentage text-green-500"></i> Margem de Lucro por Produto
+                    </h2>
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-indigo-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-indigo-700 uppercase">Produto</th>
+                                <th class="px-4 py-2 text-left text-xs font-semibold text-indigo-700 uppercase">Margem (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">Açaí Tradicional</td>
+                                <td class="px-4 py-2 text-sm text-green-700 font-bold">62%</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">Pizza Calabresa</td>
+                                <td class="px-4 py-2 text-sm text-green-700 font-bold">55%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Exportação PDF/Excel/CSV -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+                    <h2 class="text-lg font-bold text-indigo-800 mb-4 md:mb-0 flex items-center gap-2">
+                        <i class="fas fa-file-export text-indigo-500"></i> Exportar Relatórios
+                    </h2>
+                    <div class="flex space-x-3">
+                        <button onclick="exportPDF()" class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 flex items-center font-semibold">
+                            <i class="fas fa-file-pdf mr-2"></i> PDF
+                        </button>
+                        <button onclick="exportExcel()" class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 flex items-center font-semibold">
+                            <i class="fas fa-file-excel mr-2"></i> Excel
+                        </button>
+                        <button onclick="exportCSV()" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 flex items-center font-semibold">
+                            <i class="fas fa-file-csv mr-2"></i> CSV
+                        </button>
+                    </div>
+                </div>
+
+                <script>
+                function exportPDF() {
+                    // Captura os dados diretamente da tela
+                    // Faturamento, pedidos e ticket médio podem ser capturados de elementos na tela, se existirem
+                    // Exemplo: <span id="faturamentoTotal">R$ 12.500,00</span>
+                    const faturamento = document.getElementById('faturamentoTotal') ? document.getElementById('faturamentoTotal').textContent : 'N/A';
+                    const pedidos = document.getElementById('numPedidos') ? document.getElementById('numPedidos').textContent : 'N/A';
+                    const ticketMedio = document.getElementById('ticketMedio') ? document.getElementById('ticketMedio').textContent : 'N/A';
+
+                    // Produtos mais vendidos
+                    const produtosMaisVendidos = Array.from(document.querySelectorAll('#produtosMaisVendidos li')).map(li => li.innerText);
+
+                    // Produtos menos vendidos
+                    const produtosMenosVendidos = Array.from(document.querySelectorAll('#produtosMenosVendidos li')).map(li => li.innerText);
+
+                    // Cria o HTML do relatório
+                    const printWindow = window.open('', '', 'width=600,height=700');
+                    printWindow.document.write(`
+                        <html>
+                        <head>
+                            <title>Relatório Resumo - Pedidos On</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; padding: 32px; background: #f3f4f6; }
+                                h1 { color: #4338ca; font-size: 2em; margin-bottom: 24px; text-align: center; }
+                                .card { background: #fff; border-radius: 16px; box-shadow: 0 2px 8px #0001; padding: 24px; margin-bottom: 24px; text-align: center; }
+                                .label { font-size: 1em; color: #6366f1; font-weight: bold; margin-bottom: 8px; }
+                                .value { font-size: 2em; font-weight: bold; color: #111827; }
+                                .section { margin-bottom: 24px; }
+                                ul { padding-left: 0; list-style: none; }
+                                li { margin-bottom: 8px; font-size: 1em; }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>Resumo do Período</h1>
+                            <div class="card">
+                                <div class="label">Faturamento Total</div>
+                                <div class="value">${faturamento}</div>
+                            </div>
+                            <div class="card">
+                                <div class="label">Número de Pedidos</div>
+                                <div class="value">${pedidos}</div>
+                            </div>
+                            <div class="card">
+                                <div class="label">Ticket Médio</div>
+                                <div class="value">${ticketMedio}</div>
+                            </div>
+                            <div class="section">
+                                <div class="label">Produtos Mais Vendidos</div>
+                                <ul>
+                                    ${produtosMaisVendidos.map(p => `<li>${p}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="section">
+                                <div class="label">Produtos Menos Vendidos</div>
+                                <ul>
+                                    ${produtosMenosVendidos.map(p => `<li>${p}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <script>
+                                window.onload = function(){ window.print(); }
+                            //<\/script>
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                }
+                function exportExcel() {
+                    alert('Exportação para Excel não implementada neste exemplo.');
+                }
+                function exportCSV() {
+                    alert('Exportação para CSV não implementada neste exemplo.');
+                }
+                </script>
+
+                <!-- Script do Gráfico de Pizza -->
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const ctx = document.getElementById('resumoGrafico').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Faturamento Total', 'Pedidos', 'Ticket Médio'],
+                            datasets: [{
+                                data: [12500, 320, 39.06],
+                                backgroundColor: [
+                                    'rgba(16, 185, 129, 0.7)', // Faturamento
+                                    'rgba(59, 130, 246, 0.7)', // Pedidos
+                                    'rgba(253, 224, 71, 0.7)'  // Ticket Médio
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#6366f1',
+                                        font: { weight: 'bold', size: 12 }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+                </script>
+            </main>
+        </div>
+    </div>
+
+    <div class="hidden">
+        <span id="faturamentoTotal">R$ 12.500,00</span>
+        <span id="numPedidos">320</span>
+        <span id="ticketMedio">R$ 39,06</span>
+    </div>
+
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const collapseIcon = document.getElementById('collapseIcon');
+        let isSidebarCollapsed = false; 
+
+        function applySidebarState() {
+            if (window.innerWidth > 768) { 
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    content.style.marginLeft = '80px'; 
+                    if(collapseIcon) collapseIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.style.marginLeft = '16rem'; 
+                    if(collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            } else { 
+                 content.style.marginLeft = '0px';
+                 sidebar.classList.remove('collapsed'); 
+                 if(collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left'); 
+            }
+        }
+        
+        function toggleSidebar() {
+            if (window.innerWidth > 768) { 
+                isSidebarCollapsed = !isSidebarCollapsed;
+                applySidebarState();
+            }
+        }
+        
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('open');
+        }
+        
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) userMenu.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const userButton = document.querySelector('button[onclick="toggleUserMenu()"]');
+            
+            if (userMenu && userButton && !userMenu.classList.contains('hidden')) {
+                if (!userMenu.contains(event.target) && !userButton.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            }
+        });
+
+        window.addEventListener('resize', applySidebarState);
+        document.addEventListener('DOMContentLoaded', applySidebarState); 
+    </script>
+</body>
+</html>

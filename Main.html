@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos On - Sistema de Pedidos Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header/Navbar -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="bg-indigo-600 text-white p-2 rounded-lg mr-3">
+                        <i class="fas fa-shopping-bag text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">Pedidos On</h1>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-indigo-600 font-medium">Início</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition-all">Recursos</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition-all">Preços</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition-all">Contato</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <a href="Login.html" class="text-gray-600 hover:text-indigo-600 transition-all hidden md:block">Login</a>
+                    <a href="Cadastro.html" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all">Cadastre-se</a>
+                    <button class="md:hidden text-gray-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Gerencie seus pedidos online com facilidade</h1>
+                    <p class="text-xl mb-8 opacity-90">O sistema completo para gerenciamento de pedidos, estoque e clientes. Tudo em um só lugar!</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium text-center hover:bg-gray-100 transition-all">Começar agora</a>
+                        <a href="#" class="border border-white text-white px-6 py-3 rounded-lg font-medium text-center hover:bg-white hover:bg-opacity-10 transition-all">Ver demonstração</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Dashboard Pedidos On" class="rounded-xl shadow-2xl border-8 border-white">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Recursos poderosos para seu negócio</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Tudo que você precisa para gerenciar seus pedidos online de forma eficiente e profissional.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-xl transition-all">
+                    <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-clipboard-list text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Gestão de Pedidos</h3>
+                    <p class="text-gray-600">Acompanhe todos os pedidos em tempo real, com status atualizado e histórico completo.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-xl transition-all">
+                    <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-boxes text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Controle de Estoque</h3>
+                    <p class="text-gray-600">Mantenha seu estoque sempre atualizado com alertas automáticos para reposição.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-xl transition-all">
+                    <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Relatórios Avançados</h3>
+                    <p class="text-gray-600">Gere relatórios detalhados de vendas, produtos mais vendidos e desempenho geral.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-xl transition-all">
+                    <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-mobile-alt text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Aplicativo Móvel</h3>
+                    <p class="text-gray-600">Gerencie seus pedidos de qualquer lugar com nosso aplicativo exclusivo.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-xl transition-all">
+                    <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Gestão de Clientes</h3>
+                    <p class="text-gray-600">Cadastro completo de clientes com histórico de compras e preferências.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-xl transition-all">
+                    <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-plug text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Integrações</h3>
+                    <p class="text-gray-600">Conecte-se com marketplaces, ERPs e outros sistemas do seu negócio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Como funciona</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Em poucos passos você estará gerenciando seus pedidos com eficiência.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-indigo-100 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                                <span class="font-bold">1</span>
+                            </div>
+                            <h3 class="text-xl font-semibold">Cadastre sua empresa</h3>
+                        </div>
+                        <p class="text-gray-600 ml-14">Crie sua conta e configure as informações básicas do seu negócio em minutos.</p>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Cadastro" class="rounded-lg shadow-md w-full max-w-md">
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row-reverse justify-between items-center mb-12">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-indigo-100 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                                <span class="font-bold">2</span>
+                            </div>
+                            <h3 class="text-xl font-semibold">Adicione seus produtos</h3>
+                        </div>
+                        <p class="text-gray-600 ml-14">Importe sua lista de produtos ou cadastre manualmente com fotos e descrições.</p>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Produtos" class="rounded-lg shadow-md w-full max-w-md">
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-indigo-100 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                                <span class="font-bold">3</span>
+                            </div>
+                            <h3 class="text-xl font-semibold">Comece a receber pedidos</h3>
+                        </div>
+                        <p class="text-gray-600 ml-14">Integre com seu site, marketplace ou comece a registrar pedidos manualmente.</p>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Pedidos" class="rounded-lg shadow-md w-full max-w-md">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">O que nossos clientes dizem</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Veja como o Pedidos On está transformando negócios como o seu.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-8 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">"O Pedidos On revolucionou nosso controle de estoque. Agora sabemos exatamente quando repor produtos e evitamos perdas."</p>
+                    <div class="flex items-center">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold">Ana Carolina</h4>
+                            <p class="text-gray-500 text-sm">Loja de Cosméticos</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">"A integração com os marketplaces foi fundamental para nosso crescimento. Agora centralizamos tudo em um só lugar."</p>
+                    <div class="flex items-center">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold">Ricardo Almeida</h4>
+                            <p class="text-gray-500 text-sm">Distribuidora de Alimentos</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">"Os relatórios nos ajudaram a identificar nossos produtos mais rentáveis e ajustar nossa estratégia de vendas."</p>
+                    <div class="flex items-center">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold">Fernanda Souza</h4>
+                            <p class="text-gray-500 text-sm">Loja de Roupas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 hero-gradient text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Pronto para transformar seu negócio?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90">Experimente o Pedidos On gratuitamente por 14 dias. Sem compromisso, sem cartão de crédito.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#" class="bg-white text-indigo-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-all">Comece seu teste grátis</a>
+                <a href="#" class="border border-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition-all">Fale com nosso time</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="bg-indigo-600 text-white p-2 rounded-lg mr-3">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Pedidos On</h3>
+                    </div>
+                    <p class="mb-4">O sistema completo para gestão de pedidos online.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Produto</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition-all">Recursos</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Preços</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Integrações</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Atualizações</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Suporte</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition-all">Central de Ajuda</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Tutoriais</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">API</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Empresa</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition-all">Sobre</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Carreiras</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">Contato</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="mb-4 md:mb-0">© 2023 Pedidos On. Todos os direitos reservados.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-white transition-all">Termos de Serviço</a>
+                    <a href="#" class="hover:text-white transition-all">Política de Privacidade</a>
+                    <a href="#" class="hover:text-white transition-all">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle functionality would go here
+        document.addEventListener('DOMContentLoaded', function() {
+            // You could add animations or other interactive elements here
+        });
+    </script>
+</body>
+</html>

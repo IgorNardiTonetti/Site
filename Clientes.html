@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat com Clientes (WhatsApp) - Pedidos On</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #e5e7eb; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .contact-list-item.selected { background-color: #eef2ff; }
+        .chat-bg { background-color: #e5ddd5; }
+        .chat-bubble { max-width: 75%; padding: 8px 12px; border-radius: 8px; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,0.05); }
+        .chat-bubble-sent { background-color: #dcf8c6; align-self: flex-end; }
+        .chat-bubble-received { background-color: #ffffff; align-self: flex-start; }
+        .sidebar { transition: all 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text, .sidebar.collapsed .user-info .ml-3, .sidebar.collapsed .collapse-btn-text { display: none; }
+        .sidebar.collapsed .nav-item, .sidebar.collapsed .user-info, .sidebar.collapsed .collapse-btn-container button { justify-content: center; }
+        .sidebar.collapsed .user-info img { margin-left: 0; }
+        .content { transition: all 0.3s ease; margin-left: 16rem; }
+        .content.expanded { margin-left: 80px; }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; z-index: 1000; transform: translateX(-100%); width: 256px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar.collapsed { width: 256px; }
+            .sidebar.collapsed.open .nav-text, .sidebar.collapsed.open .logo-text, .sidebar.collapsed.open .user-info .ml-3, .sidebar.collapsed.open .collapse-btn-text { display: inline-block; }
+            .sidebar.collapsed.open .nav-item, .sidebar.collapsed.open .user-info, .sidebar.collapsed.open .collapse-btn-container button { justify-content: flex-start; }
+            .content { margin-left: 0 !important; }
+            .content.expanded { margin-left: 0 !important; }
+            .mobile-menu-btn { display: block !important; }
+            .desktop-collapse-btn { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-200 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar bg-indigo-800 text-white w-64 flex flex-col h-full fixed">
+            <div class="p-4 flex items-center border-b border-indigo-700">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <span class="logo-text ml-3 text-xl font-bold">Pedidos On</span>
+            </div>
+            <div class="user-info p-4 flex items-center border-b border-indigo-700 mb-2">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3">
+                    <div class="font-medium">Maria Silva</div>
+                    <div class="text-xs text-indigo-300">Admin</div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 hide-scrollbar">
+                <div class="space-y-1 px-3">
+                    <a href="Dashboard.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-home text-lg w-6"></i>
+                        <span class="nav-text ml-3">Dashboard</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-chart-line text-lg w-6"></i>
+                        <span class="nav-text ml-3">Analytics</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-indigo-900 text-white">
+                        <i class="fas fa-users text-lg w-6"></i>
+                        <span class="nav-text ml-3">Clientes</span>
+                    </a>
+                    <a href="pedidos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-shopping-cart text-lg w-6"></i>
+                        <span class="nav-text ml-3">Pedidos</span>
+                        <span class="nav-text ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                    </a>
+                    <a href="produtos.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-boxes text-lg w-6"></i>
+                        <span class="nav-text ml-3">Produtos</span>
+                    </a>
+                    <a href="faturas.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-file-invoice-dollar text-lg w-6"></i>
+                        <span class="nav-text ml-3">Faturas</span>
+                    </a>
+                    <a href="configuracoes.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-cog text-lg w-6"></i>
+                        <span class="nav-text ml-3">Configurações</span>
+                    </a>
+                </div>
+                <div class="px-3 mt-8">
+                    <div class="text-xs font-semibold text-indigo-300 uppercase tracking-wider px-4 mb-2 nav-text">Outros</div>
+                    <a href="ajuda.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-question-circle text-lg w-6"></i>
+                        <span class="nav-text ml-3">Ajuda</span>
+                    </a>
+                    <a href="Login.html" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                        <i class="fas fa-sign-out-alt text-lg w-6"></i>
+                        <span class="nav-text ml-3">Sair</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="collapse-btn-container p-4 border-t border-indigo-700 desktop-collapse-btn">
+                <button onclick="toggleSidebar()" class="w-full flex items-center text-indigo-200 hover:text-white">
+                    <i id="collapseIcon" class="fas fa-chevron-left text-lg"></i>
+                    <span class="nav-text ml-2 collapse-btn-text">Recolher</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="content flex-1 flex flex-col overflow-hidden">
+            <main class="flex-1 flex flex-col">
+                <div id="connect-screen" class="flex-1 flex flex-col items-center justify-center bg-white p-8 text-center">
+                    <i class="fab fa-whatsapp text-8xl text-green-500 mb-6"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">Conectar ao WhatsApp</h1>
+                    <p id="connection-status" class="text-gray-600 mt-2 max-w-sm">Verificando status...</p>
+                    <div id="qr-container" class="my-8 p-4 bg-white border rounded-lg shadow-md hidden">
+                         <div id="qr-code-img"></div>
+                    </div>
+                    <button id="retry-btn" onclick="window.location.reload()" class="mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 hidden">Tentar Novamente</button>
+                </div>
+
+                <div id="chat-interface" class="flex-1 flex overflow-hidden hidden">
+                    <div class="w-full sm:w-1/3 lg:w-1/4 bg-white border-r flex flex-col">
+                        <div class="p-2 bg-gray-50 border-b flex-shrink-0">
+                            <input type="text" id="search-input" placeholder="Buscar contato..." class="w-full pl-4 pr-3 py-1.5 border rounded-lg text-sm">
+                        </div>
+                        <div class="flex-1 overflow-y-auto hide-scrollbar" id="contact-list"></div>
+                    </div>
+
+                    <div id="chat-window" class="flex-1 flex flex-col">
+                        <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-center bg-gray-200 p-10">
+                            <i class="fab fa-whatsapp text-8xl text-gray-300"></i>
+                            <h2 class="text-xl text-gray-600">Selecione uma conversa</h2>
+                        </div>
+                        <div id="chat-content" class="hidden flex-1 flex flex-col">
+                            <header id="chat-header" class="p-3 bg-gray-100 border-b flex items-center shadow-sm flex-shrink-0"></header>
+                            <main id="chat-messages" class="flex-1 p-6 overflow-y-auto chat-bg flex flex-col space-y-2"></main>
+                            <footer class="p-3 bg-gray-100 border-t flex-shrink-0">
+                                <div class="flex items-center bg-white rounded-full px-2 py-1">
+                                    <textarea id="message-input" class="flex-1 p-2 bg-transparent focus:outline-none resize-none" rows="1" placeholder="Digite uma mensagem..."></textarea>
+                                    <button id="send-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-full"><i class="fas fa-paper-plane"></i></button>
+                                </div>
+                            </footer>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script>
+        // LÓGICA DA SIDEBAR
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const collapseIcon = document.getElementById('collapseIcon');
+        let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        function applySidebarState() {
+            if (window.innerWidth > 768) {
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    content.classList.add('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.classList.remove('expanded');
+                    if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            } else {
+                content.classList.remove('expanded');
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.remove('open');
+                if (collapseIcon) collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+            }
+        }
+        function toggleSidebar() {
+            if (window.innerWidth > 768) {
+                isSidebarCollapsed = !isSidebarCollapsed;
+                localStorage.setItem('sidebarCollapsed', isSidebarCollapsed);
+                applySidebarState();
+            }
+        }
+        window.addEventListener('resize', applySidebarState);
+        document.addEventListener('DOMContentLoaded', applySidebarState);
+
+        // --- LÓGICA DE CONEXÃO E CHAT ---
+        const socket = io("http://localhost:3001");
+        const connectScreen = document.getElementById("connect-screen");
+        const chatInterface = document.getElementById("chat-interface");
+        const connectionStatus = document.getElementById("connection-status");
+        const qrContainer = document.getElementById("qr-container");
+        const qrCodeDiv = document.getElementById("qr-code-img");
+        const retryBtn = document.getElementById("retry-btn");
+        const contactListDiv = document.getElementById('contact-list');
+        const searchInput = document.getElementById('search-input');
+        const chatPlaceholder = document.getElementById('chat-placeholder');
+        const chatContent = document.getElementById('chat-content');
+        const chatHeader = document.getElementById('chat-header');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        let contacts = [];
+        let selectedContact = null;
+
+        socket.on('connect', () => {
+            connectionStatus.textContent = 'Verificando status do WhatsApp...';
+            socket.emit('checkStatus');
+        });
+        
+        socket.on('statusUpdate', (data) => {
+            connectionStatus.textContent = data.message;
+            switch(data.status) {
+                case 'ready':
+                    connectScreen.classList.add("hidden");
+                    chatInterface.classList.remove("hidden");
+                    contactListDiv.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full text-gray-500">
+                           <i class="fas fa-spinner fa-spin text-2xl"></i>
+                           <p class="mt-2 text-sm">Carregando contatos...</p>
+                        </div>`;
+                    socket.emit("getContacts");
+                    break;
+                case 'qr':
+                    chatInterface.classList.add("hidden");
+                    connectScreen.classList.remove("hidden");
+                    qrContainer.classList.remove("hidden");
+                    retryBtn.classList.add("hidden");
+                    break;
+                case 'disconnected':
+                default:
+                    chatInterface.classList.add("hidden");
+                    connectScreen.classList.remove("hidden");
+                    qrContainer.classList.add("hidden");
+                    retryBtn.classList.remove("hidden");
+                    break;
+            }
+        });
+
+        socket.on("qr", (qr) => {
+            connectionStatus.textContent = "Escaneie o QR Code com seu WhatsApp:";
+            qrContainer.classList.remove("hidden");
+            qrCodeDiv.innerHTML = '';
+            QRCode.toCanvas(qr, { width: 200, margin: 1 }, (err, canvas) => {
+                if (err) console.error("Erro ao gerar QR Code:", err);
+                if(canvas) qrCodeDiv.appendChild(canvas);
+            });
+        });
+        
+        socket.on("disconnect", () => {
+            connectionStatus.textContent = "Servidor desconectado. Tente recarregar a página.";
+        });
+
+        socket.on("contacts", (data) => {
+            contacts = data;
+            renderContacts('');
+        });
+
+        socket.on("message", (msg) => {
+            if (selectedContact && msg.from === selectedContact.id) {
+                displayMessage(msg.body, 'received');
+            }
+        });
+        
+        socket.on("history", (msgs) => {
+            chatMessages.innerHTML = '';
+            if (Array.isArray(msgs)) {
+                msgs.forEach(msg => {
+                    displayMessage(msg.body, msg.fromMe ? 'sent' : 'received');
+                });
+            }
+        });
+
+        function renderContacts(filter = '') {
+            contactListDiv.innerHTML = '';
+            const filteredContacts = contacts.filter(c => c && (c.pushName || c.name || '').toLowerCase().includes(filter.toLowerCase()));
+            if (filteredContacts.length === 0) {
+                contactListDiv.innerHTML = '<p class="text-center text-gray-500 p-4">Nenhum contato encontrado.</p>';
+                return;
+            }
+            filteredContacts.forEach(contact => {
+                const div = document.createElement('div');
+                div.className = `contact-list-item flex items-center p-3 cursor-pointer hover:bg-gray-100 border-b ${selectedContact?.id === contact.id ? 'selected' : ''}`;
+                div.onclick = () => selectContact(contact);
+                const contactName = contact.pushName || contact.name || contact.id.split('@')[0];
+                const avatarUrl = contact.profilePictureUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(contactName)}&background=random&color=fff`;
+                div.innerHTML = `<img class="h-10 w-10 rounded-full object-cover" src="${avatarUrl}" alt="Avatar"><div class="ml-3 flex-1"><p class="text-sm font-semibold text-gray-800">${contactName}</p></div>`;
+                contactListDiv.appendChild(div);
+            });
+        }
+
+        function selectContact(contact) {
+            selectedContact = contact;
+            renderContacts(searchInput.value);
+            const contactName = contact.pushName || contact.name || contact.id.split('@')[0];
+            const avatarUrl = contact.profilePictureUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(contactName)}&background=random&color=fff`;
+            chatHeader.innerHTML = `<img class="h-10 w-10 rounded-full object-cover" src="${avatarUrl}" alt="Avatar"><div class="ml-3"><p class="text-sm font-semibold text-gray-800">${contactName}</p></div>`;
+            chatPlaceholder.classList.add('hidden');
+            chatContent.classList.remove('hidden');
+            messageInput.focus();
+            socket.emit("getHistory", contact.id);
+        }
+
+        function displayMessage(message, type) {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble chat-bubble-${type}`;
+            bubble.textContent = message;
+            chatMessages.appendChild(bubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text || !selectedContact) return;
+            displayMessage(text, 'sent');
+            socket.emit("sendMessage", { to: selectedContact.id, body: text });
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+        searchInput.addEventListener('input', (e) => renderContacts(e.target.value));
+    </script>
+</body>
+</html>
